@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_DATABASE_NAME=${MONGO_DATABASE_NAME}
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  nestjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fusion
+    depends_on:
+      - mongo
+    ports:
+      - "${APP_PORT}:3000"
+    environment:
+      MONGO_URL: ${MONGO_URL}
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_MONGODB_URL=${MONGO_URL}
+      - ME_CONFIG_BASICAUTH=${ME_CONFIG_BASICAUTH}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
