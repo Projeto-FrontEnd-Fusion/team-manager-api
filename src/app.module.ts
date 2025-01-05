@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
+import { dataSourceConfig } from './database/dataSource';
+import { MemberModule } from './modules/members/member.module';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://127.0.0.1/fusion', {
-    serverSelectionTimeoutMS: 50000,
-  })],
+  imports: [dataSourceConfig(), MemberModule],
   controllers: [AppController],
   providers: [AppService],
 })
