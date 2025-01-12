@@ -22,6 +22,18 @@ export class MemberDto {
   @IsString()
   currentSquad: string;
 
+  @ApiProperty({ description: 'Your professional profile with  url linkedin', example: ['https://redeprofissional/seunome'] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  professionalProfile: string[];
+
+  @ApiProperty({ description: 'Your professional platform', example: ['github'] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  platform: string[];
+
   @ApiProperty({ description: 'Technical skills', example: ['JavaScript', 'TypeScript'] })
   @IsArray()
   @ArrayNotEmpty()

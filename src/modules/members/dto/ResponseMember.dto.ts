@@ -1,22 +1,26 @@
 import { Member } from "../schema/Member";
+import { mapperToPlatformUrl } from "../util/mapperToPlataformUrl";
+import { ProfissionalProfileResponse } from "./ProfileResponse.dto";
 
 export class ResponseMember {
   id: string;
   name: string;
   stack: string;
-  communityLevel: string;
-  currentSquad: string;
+  professional_profile_url: ProfissionalProfileResponse[];
+  community_level: string;
+  current_squad: string;
   skills: string[];
-  softSkills: string[];
+  soft_skills: string[];
 
   constructor(id: string, member: Member) {
     this.id = id;
     this.name = member.name;
     this.stack = member.stack;
-    this.communityLevel = member.communityLevel;
-    this.currentSquad = member.currentSquad;
+    this.community_level = member.communityLevel;
+    this.professional_profile_url = mapperToPlatformUrl(member)
+    this.current_squad = member.currentSquad;
     this.skills = member.skills;
-    this.softSkills = member.softSkills;
+    this.soft_skills = member.softSkills;
   }
 }
 

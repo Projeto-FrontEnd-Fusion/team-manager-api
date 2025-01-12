@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsString, IsOptional } from "class-validator";
+import { IsArray, IsString, IsOptional, ArrayNotEmpty } from "class-validator";
 
 export class UpdateMemberDto {
   @ApiProperty({ description: 'Name of the member', example: 'John Doe', required: false })
@@ -21,6 +21,19 @@ export class UpdateMemberDto {
   @IsOptional()
   @IsString()
   currentSquad: string;
+
+  @ApiProperty({ description: 'Your professional profile with  url linkedin', example: ['https://redeprofissional/seunome'] })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  professionalProfile: string[];
+
+  @ApiProperty({ description: 'Your professional platform', example: ['linkedin', 'github'] })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  platform: string[];
+
 
   @ApiProperty({ description: 'Technical skills', example: ['JavaScript', 'TypeScript'], required: false })
   @IsArray()

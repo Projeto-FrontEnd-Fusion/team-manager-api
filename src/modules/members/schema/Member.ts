@@ -19,6 +19,12 @@ export class Member {
   currentSquad: string;
 
   @Prop([String])
+  professionalProfile: string[];
+
+  @Prop([String])
+  platform: string[];
+
+  @Prop([String])
   skills: string[];
 
   @Prop([String])

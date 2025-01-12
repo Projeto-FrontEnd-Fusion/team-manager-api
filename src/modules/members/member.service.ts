@@ -51,7 +51,6 @@ export class MemberService {
     await this.findOne(id)
     const member = new Member()
     const updateMember = Object.assign(member, updates)
-
     const update = await this.memberModel.updateOne(
       { _id: id },
       { $set: updateMember },

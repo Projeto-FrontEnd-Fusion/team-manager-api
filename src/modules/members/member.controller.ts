@@ -44,7 +44,6 @@ export class MemberController {
   @HttpCode(200)
   async update(@Param('id') id: string, @Body() updates: UpdateMemberDto): Promise<void> {
     try {
-      console.log(id)
       await this.memberService.update(id, updates)
     } catch (error) {
       throw error;
