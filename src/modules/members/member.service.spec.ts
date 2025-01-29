@@ -50,12 +50,14 @@ describe('MemberController', () => {
       const responseMember: ResponseMember = {
         id: '12345',
         name: memberDto.name,
+        profile_image: memberDto.file.name,
         stack: memberDto.stack,
         community_level: memberDto.communityLevel,
         current_squad: memberDto.currentSquad,
         skills: memberDto.skills,
         soft_skills: memberDto.softSkills,
-        professional_profile_url: mapperToPlatformUrl(memberDto as Member)
+        professional_profile_url: mapperToPlatformUrl(memberDto as Member),
+        projects: []
       };
 
       jest.spyOn(service, 'create').mockResolvedValue(responseMember);

@@ -1,7 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsString, ArrayNotEmpty } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsNotEmpty, IsString, ArrayNotEmpty, IsOptional } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
 export class MemberDto {
+
   @ApiProperty({ description: 'Name of the member', example: 'John Doe' })
   @IsNotEmpty()
   @IsString()
@@ -22,27 +24,35 @@ export class MemberDto {
   @IsString()
   currentSquad: string;
 
-  @ApiProperty({ description: 'Your professional profile with  url linkedin', example: ['https://redeprofissional/seunome'] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  professionalProfile: string[];
+  @ApiProperty({ description: 'Your professional profile with URL linkedin', example: 'https://redeprofissional/seunome, https://redeprofissional/seunome' })
+  @IsNotEmpty()
+  @IsString()
+  professionalProfile: string;
 
-  @ApiProperty({ description: 'Your professional platform', example: ['github'] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  platform: string[];
+  @ApiProperty({ description: 'Your professional platform', example: 'github, linkedin' })
+  @IsNotEmpty()
+  @IsString()
+  platform: string;
 
-  @ApiProperty({ description: 'Technical skills', example: ['JavaScript', 'TypeScript'] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  skills: string[];
+  @ApiProperty({ description: 'Technical skills', example: 'JavaScript, TypeScript, Java' })
+  @IsNotEmpty()
+  @IsString()
+  skills: string;
 
-  @ApiProperty({ description: 'Soft skills', example: ['Communication', 'Teamwork'] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  softSkills: string[];
+  @ApiProperty({ description: 'Soft skills', example: 'Communication, Teamwork' })
+  @IsNotEmpty()
+  @IsString()
+  softSkills: string;
+
+  @ApiProperty({
+    description: 'Imagem de perfil',
+    type: 'string',
+    format: 'binary',
+  })
+  @IsOptional()
+  file?: any;
+
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
 }

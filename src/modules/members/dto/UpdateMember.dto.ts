@@ -1,49 +1,58 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsString, IsOptional, ArrayNotEmpty } from "class-validator";
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional } from 'class-validator';
 
 export class UpdateMemberDto {
-  @ApiProperty({ description: 'Name of the member', example: 'John Doe', required: false })
+  @ApiProperty({ description: 'Name of the member', required: false })
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
-  @ApiProperty({ description: 'Technology stack of the member', example: 'Fullstack', required: false })
+  @ApiProperty({ description: 'Technology stack of the member', required: false })
   @IsOptional()
   @IsString()
-  stack: string;
+  stack?: string;
 
-  @ApiProperty({ description: 'Community level of the member', example: 'Senior', required: false })
+  @ApiProperty({ description: 'Community level of the member', required: false })
   @IsOptional()
   @IsString()
-  communityLevel: string;
+  communityLevel?: string;
 
-  @ApiProperty({ description: 'Current squad of the member', example: 'Alpha Squad', required: false })
+  @ApiProperty({ description: 'Current squad of the member', required: false })
   @IsOptional()
   @IsString()
-  currentSquad: string;
+  currentSquad?: string;
 
-  @ApiProperty({ description: 'Your professional profile with  url linkedin', example: ['https://redeprofissional/seunome'] })
-  @IsArray()
+  @ApiProperty({ description: 'Your professional profile with URL linkedin', required: false })
   @IsOptional()
-  @IsString({ each: true })
-  professionalProfile: string[];
+  @IsString()
+  professionalProfile?: string;
 
-  @ApiProperty({ description: 'Your professional platform', example: ['linkedin', 'github'] })
-  @IsArray()
+  @ApiProperty({ description: 'Your professional platform', required: false })
   @IsOptional()
-  @IsString({ each: true })
-  platform: string[];
+  @IsString()
+  platform?: string;
 
-
-  @ApiProperty({ description: 'Technical skills', example: ['JavaScript', 'TypeScript'], required: false })
-  @IsArray()
+  @ApiProperty({ description: 'Technical skills', required: false })
   @IsOptional()
-  @IsString({ each: true })
-  skills: string[];
+  @IsString()
+  skills?: string;
 
-  @ApiProperty({ description: 'Soft skills', example: ['Communication', 'Teamwork'], required: false })
-  @IsArray()
+  @ApiProperty({ description: 'Soft skills', required: false })
   @IsOptional()
-  @IsString({ each: true })
-  softSkills: string[];
+  @IsString()
+  softSkills?: string;
+
+  @ApiProperty({
+    description: 'Imagem de perfil',
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  @IsOptional()
+  file?: any;
+
+  @ApiHideProperty()
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
 }

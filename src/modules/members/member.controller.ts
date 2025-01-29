@@ -1,22 +1,33 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { MemberDto } from "./dto/Member.dto";
-import { Member } from "./schema/Member";
 import { MemberService } from "./member.service";
-import { error } from "console";
 import { ResponseMember } from "./dto/ResponseMember.dto";
 import { UpdateMemberDto } from "./dto/UpdateMember.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { multerConfig } from "src/config/multer.config";
+import { builtinModules } from "module";
 
 @ApiTags('Members')
 @Controller('members')
 export class MemberController {
   constructor(private memberService: MemberService) { }
-  @Post()
-  @HttpCode(201)
-  async create(@Body() memberDto: MemberDto): Promise<ResponseMember> {
-    try {
-      return await this.memberService.create(memberDto)
 
+
+  @Post()
+  @UseInterceptors(FileInterceptor('file', multerConfig('member')))
+  @HttpCode(201)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: MemberDto
+  })
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() data: MemberDto
+  ): Promise<ResponseMember> {
+    try {
+      data.profileImage = file.path
+      return new ResponseMember(await this.memberService.create(data))
     } catch (error) {
       throw error;
     }
@@ -35,16 +46,28 @@ export class MemberController {
   @HttpCode(200)
   async findOne(@Param('id') id: string): Promise<ResponseMember> {
     try {
-      return await this.memberService.findOne(id)
+      return new ResponseMember(await this.memberService.findOne(id))
     } catch (error) {
       throw error;
     }
   }
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('file', multerConfig('member')))
   @HttpCode(200)
-  async update(@Param('id') id: string, @Body() updates: UpdateMemberDto): Promise<void> {
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: UpdateMemberDto
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() updates: UpdateMemberDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<ResponseMember> {
     try {
-      await this.memberService.update(id, updates)
+      if (file) {
+        updates.profileImage = file.path
+      }
+      return new ResponseMember(await this.memberService.update(id, updates))
     } catch (error) {
       throw error;
     }
@@ -64,3 +87,4 @@ export class MemberController {
 
 
 }
+
