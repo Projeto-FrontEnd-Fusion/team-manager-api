@@ -9,8 +9,7 @@ export const dataSourceConfig = () => {
 
   return MongooseModule.forRootAsync({
     useFactory: () => ({
-      uri: uri
+      uri: uri,
     }),
   });
 };
-

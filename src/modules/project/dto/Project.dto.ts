@@ -1,6 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProjectDto {
   @ApiProperty({
@@ -11,7 +10,6 @@ export class CreateProjectDto {
   @IsNotEmpty()
   @IsString()
   projectName: string;
-
 
   @IsOptional()
   @IsString()

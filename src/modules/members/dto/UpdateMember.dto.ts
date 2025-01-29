@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateMemberDto {
   @ApiProperty({ description: 'Name of the member', required: false })
@@ -7,12 +7,18 @@ export class UpdateMemberDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ description: 'Technology stack of the member', required: false })
+  @ApiProperty({
+    description: 'Technology stack of the member',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   stack?: string;
 
-  @ApiProperty({ description: 'Community level of the member', required: false })
+  @ApiProperty({
+    description: 'Community level of the member',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   communityLevel?: string;
@@ -22,25 +28,28 @@ export class UpdateMemberDto {
   @IsString()
   currentSquad?: string;
 
-  @ApiProperty({ description: 'Your professional profile with URL linkedin', required: false })
+  @ApiProperty({
+    description: 'Your professional profile with URL linkedin',
+    required: false,
+  })
   @IsOptional()
   @IsString()
-  professionalProfile?: string;
+  professionalProfile?: string[];
 
   @ApiProperty({ description: 'Your professional platform', required: false })
   @IsOptional()
   @IsString()
-  platform?: string;
+  platform?: string[];
 
   @ApiProperty({ description: 'Technical skills', required: false })
   @IsOptional()
   @IsString()
-  skills?: string;
+  skills?: string[];
 
   @ApiProperty({ description: 'Soft skills', required: false })
   @IsOptional()
   @IsString()
-  softSkills?: string;
+  softSkills?: string[];
 
   @ApiProperty({
     description: 'Imagem de perfil',

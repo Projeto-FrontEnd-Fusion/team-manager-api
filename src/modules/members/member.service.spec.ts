@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { v4 as uuidv4 } from 'uuid';
+
+import { Member } from './schema/Member';
 import { MemberController } from './member.controller';
-import { MemberService } from './member.service';
 import { MemberDto } from './dto/Member.dto';
+import { MemberService } from './member.service';
+import { ProfissionalProfileResponse } from './dto/ProfileResponse.dto';
 import { ResponseMember } from './dto/ResponseMember.dto';
 import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { mapperToPlatformUrl } from './util/mapperToPlataformUrl';
-import { Member } from './schema/Member';
-import { v4 as uuidv4 } from 'uuid';
-import { ProfissionalProfileResponse } from './dto/ProfileResponse.dto';
 
 describe('MemberController', () => {
   let controller: MemberController;
@@ -57,7 +58,7 @@ describe('MemberController', () => {
         skills: memberDto.skills,
         soft_skills: memberDto.softSkills,
         professional_profile_url: mapperToPlatformUrl(memberDto as Member),
-        projects: []
+        projects: [],
       };
 
       jest.spyOn(service, 'create').mockResolvedValue(responseMember);
@@ -80,7 +81,9 @@ describe('MemberController', () => {
           current_squad: 'Alpha Squad',
           skills: ['JavaScript', 'TypeScript'],
           soft_skills: ['Communication', 'Teamwork'],
-          professional_profile_url: [new ProfissionalProfileResponse("github", "url")],
+          professional_profile_url: [
+            new ProfissionalProfileResponse('github', 'url'),
+          ],
         },
       ];
 
@@ -100,7 +103,9 @@ describe('MemberController', () => {
         id: memberId,
         name: 'John Doe',
         stack: 'Fullstack',
-        professional_profile_url: [new ProfissionalProfileResponse("github", "url")],
+        professional_profile_url: [
+          new ProfissionalProfileResponse('github', 'url'),
+        ],
         community_level: 'Senior',
         current_squad: 'Alpha Squad',
         skills: ['JavaScript', 'TypeScript'],

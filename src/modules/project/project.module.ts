@@ -1,10 +1,11 @@
-import { Module } from "@nestjs/common";
-import { Project, ProjectSchema } from "./schema/Project";
-import { MongooseModule } from "@nestjs/mongoose";
-import { ProjectController } from "./project.controller";
-import { ProjectService } from "./project.service";
-import { MemberService } from "../members/member.service";
-import { Member, MemberSchema } from "../members/schema/Member";
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { Member, MemberSchema } from '../members/schema/Member';
+import { Project, ProjectSchema } from './schema/Project';
+import { MemberService } from '../members/member.service';
+import { ProjectController } from './project.controller';
+import { ProjectService } from './project.service';
 
 @Module({
   imports: [
@@ -16,5 +17,4 @@ import { Member, MemberSchema } from "../members/schema/Member";
   controllers: [ProjectController],
   providers: [ProjectService, MemberService],
 })
-
-export class ProjectModule { }
+export class ProjectModule {}

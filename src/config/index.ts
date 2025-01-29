@@ -1,4 +1,4 @@
-import "dotenv/config";
+import 'dotenv/config';
 
 export const EnvConfig = {
   database: {
@@ -6,6 +6,6 @@ export const EnvConfig = {
     MONGO_URL_PRODUCTION: process.env.MONGO_URL_ATLAS_PRODUCTION,
   },
   ENVIRONMENT: process.env.NODE_ENV,
-  PORT: +process.env.APP_PORT
+  PORT: +process.env.APP_PORT,
 };
 //environment

@@ -1,6 +1,6 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-import { Project } from "../../project/schema/Project";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { Project } from '../../project/schema/Project';
 import { v4 as uuidv4 } from 'uuid';
 
 export type MemberDocument = HydratedDocument<Member>;
@@ -8,7 +8,7 @@ export type MemberDocument = HydratedDocument<Member>;
 @Schema()
 export class Member {
   @Prop({ default: uuidv4 })
-  _id: string
+  _id: string;
 
   @Prop({ required: true, lowercase: true })
   name: string;
