@@ -1,7 +1,7 @@
 import { Member } from '../schema/Member';
 import { ProfissionalProfileResponse } from './ProfileResponse.dto';
-import { ResponseProjectDto } from 'src/modules/project/dto/ResponseProject.dto';
-import { mapperToPlatformUrl } from '../util/mapperToPlataformUrl';
+import { ResponseProjectDto } from '@modules/project/dto/ResponseProject.dto';
+import { mapperProfissionalProfileToPlatformUrl } from '../util/mapperToPlataformUrl';
 
 export class ResponseMember {
   id: string;
@@ -21,7 +21,7 @@ export class ResponseMember {
     this.profile_image = member.profileImage;
     this.stack = member.stack;
     this.community_level = member.communityLevel;
-    this.professional_profile_url = mapperToPlatformUrl(member);
+    this.professional_profile_url = mapperProfissionalProfileToPlatformUrl(member);
     this.current_squad = member.currentSquad;
     this.skills = member.skills;
     this.projects = member.projects.map((p) => new ResponseProjectDto(p));

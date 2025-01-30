@@ -1,12 +1,12 @@
-import { NestFactory } from '@nestjs/core';
 import * as express from 'express';
+import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
 
 import { AppModule } from './app.module';
-import { EnvConfig } from './config';
-import { corsOptions } from './config/cors';
-import { appConfig } from './config/app.config';
-import { useSwagger } from './config/useSwagger';
+import { EnvConfig } from './configs';
+import { appConfig } from './configs/app.config';
+import { corsOptions } from './configs/cors';
+import { useSwagger } from './configs/useSwagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });

@@ -12,12 +12,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerConfig } from 'src/config/multer.config';
 
 import { MemberDto } from './dto/Member.dto';
 import { MemberService } from './member.service';
 import { ResponseMember } from './dto/ResponseMember.dto';
 import { UpdateMemberDto } from './dto/UpdateMember.dto';
+import { multerConfig } from '@configs/multer.config';
 
 @ApiTags('Members')
 @Controller('members')
@@ -42,6 +42,7 @@ export class MemberController {
       throw error;
     }
   }
+
   @Get('/find-all')
   @HttpCode(200)
   async findAll(): Promise<ResponseMember[]> {
@@ -61,6 +62,7 @@ export class MemberController {
       throw error;
     }
   }
+
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file', multerConfig('member')))
   @HttpCode(200)

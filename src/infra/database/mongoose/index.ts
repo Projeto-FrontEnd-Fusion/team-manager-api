@@ -1,5 +1,6 @@
 import { MongooseModule } from '@nestjs/mongoose';
-import { EnvConfig } from 'src/config';
+
+import { EnvConfig } from '@configs/index';
 
 export const dataSourceConfig = () => {
   const uri =

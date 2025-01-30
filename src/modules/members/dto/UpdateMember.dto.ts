@@ -34,7 +34,10 @@ export class UpdateMemberDto {
   })
   @IsOptional()
   @IsString()
-  professionalProfile?: string[];
+  professionalProfile?: {
+    platform: string;
+    url: string;
+  };
 
   @ApiProperty({ description: 'Your professional platform', required: false })
   @IsOptional()

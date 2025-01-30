@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Project } from '../../project/schema/Project';
 import { v4 as uuidv4 } from 'uuid';
+
+import { Project } from '../../project/schema/Project';
 
 export type MemberDocument = HydratedDocument<Member>;
 
@@ -26,7 +27,10 @@ export class Member {
   currentSquad: string;
 
   @Prop([String])
-  professionalProfile: string[];
+  professionalProfile: {
+    platform: string;
+    url: string;
+  };
 
   @Prop([String])
   platform: string[];

@@ -34,7 +34,7 @@ describe('MemberController', () => {
   });
 
   describe('createMember', () => {
-    it('deveria criar um membro', async () => {
+    it('should create a member', async () => {
       const dto = { name: 'name', communityLevel: 'basic' };
       await request(app.getHttpServer()).post('/members').send(dto).expect(201);
     });
@@ -47,13 +47,13 @@ describe('MemberController', () => {
   });
 
   describe('findOne', () => {
-    it('deveria retornar um membro pelo ID', async () => {
+    it('should return a member', async () => {
       await request(app.getHttpServer()).get('/members/12345').expect(200);
     });
   });
 
   describe('update', () => {
-    it('deveria atualizar um membro', async () => {
+    it('shoud update a member', async () => {
       const updates = { name: 'updated name' };
       await request(app.getHttpServer())
         .patch('/members/12345')
@@ -63,7 +63,7 @@ describe('MemberController', () => {
   });
 
   describe('delete', () => {
-    it('deveria deletar um membro', async () => {
+    it('should delete a member', async () => {
       await request(app.getHttpServer()).delete('/members/12345').expect(204);
     });
   });

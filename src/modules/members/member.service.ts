@@ -1,20 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Member } from './schema/Member';
 import { MemberDto } from './dto/Member.dto';
 import { ResponseMember } from './dto/ResponseMember.dto';
 import { UpdateMemberDto } from './dto/UpdateMember.dto';
-import { convertToArray } from './util/convertToArray';
 import { deleteFile } from '../shared/deleteFiles';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MemberService {
-  constructor(
-    @InjectModel(Member.name) private readonly memberModel: Model<Member>,
-  ) {}
+  constructor(@InjectModel(Member.name) private readonly memberModel: Model<Member>) {}
 
   async create(memberDto: MemberDto): Promise<Member> {
     try {
@@ -25,11 +22,11 @@ export class MemberService {
         stack: memberDto.stack,
         communityLevel: memberDto.communityLevel,
         currentSquad: memberDto.currentSquad,
-        professionalProfile: convertToArray(memberDto.professionalProfile),
-        platform: convertToArray(memberDto.platform),
-        skills: convertToArray(memberDto.skills),
+        professionalProfile: memberDto.professionalProfile,
+        platform: memberDto.platform,
+        skills: memberDto.skills,
         projects: [],
-        softSkills: convertToArray(memberDto.softSkills),
+        softSkills: memberDto.softSkills,
       };
       const createMember = new this.memberModel(memberFormat);
       const member = await createMember.save();
@@ -67,52 +64,44 @@ export class MemberService {
     }
   }
 
-  async update(id: string, updates: UpdateMemberDto): Promise<Member> {
+  async update(id: string, payload: UpdateMemberDto): Promise<Member> {
     const memberExists = await this.findOne(id);
 
-    if (
-      updates.profileImage &&
-      updates.profileImage !== memberExists.profileImage
-    ) {
+    if (payload.profileImage && payload.profileImage !== memberExists.profileImage) {
       await deleteFile(memberExists.profileImage);
     }
 
-    if (updates.profileImage) {
-      memberExists.profileImage = updates.profileImage;
+    memberExists.profileImage = payload.profileImage || memberExists.profileImage;
+
+    if (payload.stack && payload.stack !== '') {
+      memberExists.stack = payload.stack;
     }
 
-    if (updates.stack && updates.stack !== '') {
-      memberExists.stack = updates.stack;
+    if (payload.communityLevel && payload.communityLevel !== '') {
+      memberExists.communityLevel = payload.communityLevel;
     }
 
-    if (updates.communityLevel && updates.communityLevel !== '') {
-      memberExists.communityLevel = updates.communityLevel;
+    if (payload.currentSquad && payload.currentSquad !== '') {
+      memberExists.currentSquad = payload.currentSquad;
     }
 
-    if (updates.currentSquad && updates.currentSquad !== '') {
-      memberExists.currentSquad = updates.currentSquad;
+    memberExists.professionalProfile =
+      payload.professionalProfile || memberExists.professionalProfile;
+
+    if (payload.platform && payload.platform.length > 0) {
+      memberExists.platform = payload.platform;
     }
 
-    if (updates.professionalProfile && updates.professionalProfile.length > 0) {
-      memberExists.professionalProfile = convertToArray(
-        updates.professionalProfile,
-      );
+    if (payload.skills && payload.skills.length > 0) {
+      memberExists.skills = payload.skills;
     }
 
-    if (updates.platform && updates.platform.length > 0) {
-      memberExists.platform = convertToArray(updates.platform);
+    if (payload.softSkills && payload.softSkills.length > 0) {
+      memberExists.softSkills = payload.softSkills;
     }
 
-    if (updates.skills && updates.skills.length > 0) {
-      memberExists.skills = convertToArray(updates.skills);
-    }
-
-    if (updates.softSkills && updates.softSkills.length > 0) {
-      memberExists.softSkills = convertToArray(updates.softSkills);
-    }
-
-    if (updates.name && updates.name !== '') {
-      memberExists.name = updates.name;
+    if (payload.name && payload.name !== '') {
+      memberExists.name = payload.name;
     }
 
     await this.memberModel.updateOne({ _id: id }, { $set: memberExists });

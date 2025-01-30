@@ -1,7 +1,7 @@
 import { Member } from '../schema/Member';
 import { ProfissionalProfileResponse } from '../dto/ProfileResponse.dto';
 
-export function mapperToPlatformUrl(
+export function mapperProfissionalProfileToPlatformUrl(
   member: Member,
 ): ProfissionalProfileResponse[] {
   // Usando map para combinar plataformas e URLs

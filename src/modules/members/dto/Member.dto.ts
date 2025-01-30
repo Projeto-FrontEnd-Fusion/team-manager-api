@@ -33,12 +33,14 @@ export class MemberDto {
 
   @ApiProperty({
     description: 'Your professional profile with URL linkedin',
-    example:
-      'https://redeprofissional/seunome, https://redeprofissional/seunome',
+    example: { plataform: 'linkedin', url: 'https://linkedin.com/seunome' },
   })
   @IsNotEmpty()
   @IsString()
-  professionalProfile: string[];
+  professionalProfile: {
+    platform: string;
+    url: string;
+  };
 
   @ApiProperty({
     description: 'Your professional platform',
@@ -46,7 +48,7 @@ export class MemberDto {
   })
   @IsNotEmpty()
   @IsString()
-  platform: string;
+  platform: string[];
 
   @ApiProperty({
     description: 'Technical skills',
@@ -54,7 +56,7 @@ export class MemberDto {
   })
   @IsNotEmpty()
   @IsString()
-  skills: string;
+  skills: string[];
 
   @ApiProperty({
     description: 'Soft skills',
@@ -62,7 +64,7 @@ export class MemberDto {
   })
   @IsNotEmpty()
   @IsString()
-  softSkills: string;
+  softSkills: string[];
 
   @ApiProperty({
     description: 'Imagem de perfil',

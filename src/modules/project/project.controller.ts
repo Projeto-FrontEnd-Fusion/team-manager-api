@@ -13,7 +13,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CreateProjectDto } from './dto/Project.dto';
 import { ProjectService } from './project.service';
-import { multerConfig } from 'src/config/multer.config';
+import { multerConfig } from '@configs/multer.config';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -38,10 +38,7 @@ export class ProjectController {
 
   @Delete(':id/member-id/:memberId')
   @HttpCode(204)
-  async removeProject(
-    @Param('id') id: string,
-    @Param('memberId') memberId: string,
-  ) {
+  async removeProject(@Param('id') id: string, @Param('memberId') memberId: string) {
     this.projectService.removeProject(id, memberId);
   }
 }
