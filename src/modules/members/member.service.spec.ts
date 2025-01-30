@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Member } from './schema/Member';
 import { MemberController } from './member.controller';
-import { MemberDto } from './dto/Member.dto';
 import { MemberService } from './member.service';
 import { ProfissionalProfileResponse } from './dto/ProfileResponse.dto';
 import { ResponseMember } from './dto/ResponseMember.dto';
@@ -13,6 +12,33 @@ import { UpdateMemberDto } from './dto/UpdateMember.dto';
 describe('MemberController', () => {
   let controller: MemberController;
   let service: MemberService;
+
+  const member = {
+    _id: '12345',
+    name: 'John Doe',
+    stack: 'Fullstack',
+    communityLevel: 'Senior',
+    professionalProfile: {
+      platform: 'linkedin',
+      url: 'https://linkedin.com/meu-perfil',
+    },
+    platform: ['linkedin'],
+    currentSquad: 'Alpha Squad',
+    skills: ['JavaScript', 'TypeScript'],
+    softSkills: ['Communication', 'Teamwork'],
+    file: { name: 'teste' },
+    projects: [
+      {
+        _id: '12345',
+        projectName: 'Team Manager API',
+        projectCover: 'cover.jpg',
+        description: 'Team Managar API dos Vingadores',
+        technologies: ['typescript', 'nestjs'],
+        projectUrl: 'www.teammanagarapi.vingadores.com.br',
+      },
+    ],
+    profileImage: 'image.jpg',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,42 +63,27 @@ describe('MemberController', () => {
 
   describe('create', () => {
     it('should call service.create with the received MemberDto and return the result', async () => {
-      const memberDto: MemberDto = {
-        name: 'John Doe',
-        stack: 'Fullstack',
-        communityLevel: 'Senior',
-        professionalProfile: {
-          platform: 'linkedin',
-          url: 'https://linkedin.com/meu-perfil',
-        },
-        platform: ['linkedin'],
-        currentSquad: 'Alpha Squad',
-        skills: ['JavaScript', 'TypeScript'],
-        softSkills: ['Communication', 'Teamwork'],
-        file: { name: 'teste' },
-      };
-
       const responseMember: Member = {
         _id: '12345',
-        name: memberDto.name,
-        profileImage: memberDto.file.name,
-        stack: memberDto.stack,
-        communityLevel: memberDto.communityLevel,
-        currentSquad: memberDto.currentSquad,
-        skills: memberDto.skills,
-        softSkills: memberDto.softSkills,
-        professionalProfile: memberDto.professionalProfile,
         projects: [],
-        platform: ['linkedin'],
+        name: member.name,
+        profileImage: member.file.name,
+        stack: member.stack,
+        communityLevel: member.communityLevel,
+        currentSquad: member.currentSquad,
+        skills: member.skills,
+        softSkills: member.softSkills,
+        professionalProfile: member.professionalProfile,
+        platform: member.platform,
       };
 
       jest.spyOn(service, 'create').mockResolvedValue(responseMember);
 
       // TODO: Fix Path
       const file = { path: 'path/to/file' } as Express.Multer.File;
-      const result = await controller.create(file, memberDto);
+      const result = await controller.create(file, member);
 
-      expect(service.create).toHaveBeenCalledWith(memberDto);
+      expect(service.create).toHaveBeenCalledWith(member);
       expect(result).toEqual(responseMember);
     });
   });
@@ -115,31 +126,6 @@ describe('MemberController', () => {
   describe('findOne', () => {
     it('should call service.findOne with the given id and return the result', async () => {
       const memberId = '60d0fe4f5311236168a109ca';
-      const member: Member = {
-        _id: memberId,
-        name: 'John Doe',
-        profileImage: 'image.jpg',
-        stack: 'Fullstack',
-        communityLevel: 'Senior',
-        currentSquad: 'Alpha Squad',
-        skills: ['JavaScript', 'TypeScript'],
-        softSkills: ['Communication', 'Teamwork'],
-        professionalProfile: {
-          platform: 'github',
-          url: 'url',
-        },
-        projects: [
-          {
-            _id: '12345',
-            projectName: 'Team Manager API',
-            projectCover: 'cover.jpg',
-            description: 'Team Managar API dos Vingadores',
-            technologies: ['typescript', 'nestjs'],
-            projectUrl: 'www.teammanagarapi.vingadores.com.br',
-          },
-        ],
-        platform: ['github'],
-      };
 
       jest.spyOn(service, 'findOne').mockResolvedValue(member);
 
@@ -177,13 +163,9 @@ describe('MemberController', () => {
 
   describe('delete', () => {
     it('should call service.delete with the given id and return void', async () => {
-      const id = '12345';
-
       jest.spyOn(service, 'delete').mockResolvedValue(undefined);
-
-      await controller.delete(id);
-
-      expect(service.delete).toHaveBeenCalledWith(id);
+      await controller.delete('12345');
+      expect(service.delete).toHaveBeenCalledWith('12345');
     });
   });
 });
