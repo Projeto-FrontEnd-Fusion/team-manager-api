@@ -1,55 +1,91 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Project } from './schema/Project';
+import { In, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CreateProjectDto } from './dto/Project.dto';
-import { Member } from '../members/schema/Member';
-import { MemberService } from '../members/member.service';
-import { convertToArray } from '../members/util/convertToArray';
-import { deleteFile } from '../shared/deleteFiles';
+
+import { Member } from 'src/entity/Member';
+import { Project } from 'src/entity/Project';
 
 @Injectable()
 export class ProjectService {
   constructor(
-    @InjectModel(Project.name) private readonly projectModel: Model<Project>,
-    @InjectModel(Member.name) private readonly memberModel: Model<Member>,
-    private readonly memberService: MemberService,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
+    @InjectRepository(Member)
+    private readonly memberRepository: Repository<Member>,
   ) {}
 
-  async addProject(memberId: string, data: CreateProjectDto) {
-    try {
-      const member = await this.memberService.findOne(memberId);
-      const newProject: Project = {
-        _id: uuidv4(),
-        projectName: data.projectName,
-        projectCover: data.projectCover,
-        description: data.description,
-        technologies: convertToArray(data.technologies),
-        projectUrl: data.projectUrl,
-      };
-      member.projects.push(newProject);
-      await this.memberModel.updateOne({ _id: memberId }, { $set: member });
-    } catch {
-      throw Error();
-    }
+  async create(projectData: CreateProjectDto) {
+    const members = await this.memberRepository.findBy({ id: In(['1', '2']) });
+
+    const newProject = this.projectRepository.create({
+      id: uuidv4(),
+      projectName: projectData.projectName,
+      description: projectData.description,
+      projectUrl: projectData.projectUrl,
+      projectCover: projectData.projectCover,
+      technologies: projectData.technologies,
+      createdAt: new Date().toISOString(),
+      members: members,
+    });
+
+    return await this.projectRepository.save(newProject);
   }
 
-  async removeProject(projectId: string, memberId: string): Promise<boolean> {
-    try {
-      const member = await this.memberService.findOne(memberId);
-      if (!member) {
-        new BadRequestException('Usuário não encontrado.');
-      }
-      const project = member.projects.find((p) => p._id === projectId);
-      await deleteFile(project.projectCover);
-      member.projects = member.projects.filter((p) => p._id !== projectId);
-
-      await this.memberModel.updateOne({ _id: memberId }, { $set: member });
-      return true;
-    } catch {
-      return false;
-    }
+  async findMany(): Promise<Project[]> {
+    return await this.projectRepository.find({ relations: ['members'] });
   }
+
+  async findById(projectId: string): Promise<Project> {
+    return await this.projectRepository.findOne({ where: { id: projectId } });
+  }
+
+  async deleteById(projectId: string) {
+    const deletedProject = await this.projectRepository.delete({ id: projectId });
+    return deletedProject;
+  }
+
+  async updateProject(projectId: string, payload: Partial<Project>) {
+    const project = await this.projectRepository.findOne({ where: { id: projectId } });
+
+    const data = payload;
+  }
+
+  // Depracated
+  // async addProject(memberId: string, data: CreateProjectDto) {
+  //   try {
+  //     const member = await this.memberService.findOne(memberId);
+  //     const newProject: OldProject = {
+  //       _id: uuidv4(),
+  //       projectName: data.projectName,
+  //       projectCover: data.projectCover,
+  //       description: data.description,
+  //       technologies: convertToArray(data.technologies),
+  //       projectUrl: data.projectUrl,
+  //     };
+  //     member.projects.push(newProject);
+  //     await this.memberModel.updateOne({ _id: memberId }, { $set: member });
+  //   } catch {
+  //     throw Error();
+  //   }
+  // }
+
+  // async removeProject(projectId: string, memberId: string): Promise<boolean> {
+  //   try {
+  //     const member = await this.memberService.findOne(memberId);
+  //     if (!member) {
+  //       new BadRequestException('Usuário não encontrado.');
+  //     }
+  //     const project = member.projects.find((p) => p._id === projectId);
+  //     await deleteFile(project.projectCover);
+  //     member.projects = member.projects.filter((p) => p._id !== projectId);
+
+  //     await this.memberModel.updateOne({ _id: memberId }, { $set: member });
+  //     return true;
+  //   } catch {
+  //     return false;
+  //   }
+  // }
 }

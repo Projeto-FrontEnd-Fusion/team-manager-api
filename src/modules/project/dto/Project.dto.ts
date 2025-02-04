@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProjectDto {
@@ -27,11 +27,11 @@ export class CreateProjectDto {
   @ApiProperty({
     description: 'Technologies used in the project',
     maxLength: 250,
-    example: 'Java, JavaScript, Python',
+    example: ['Java, JavaScript, Python'],
   })
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
-  technologies: string;
+  technologies: string[];
 
   @ApiProperty({
     description: 'URL of the project',
@@ -40,6 +40,13 @@ export class CreateProjectDto {
   @IsNotEmpty()
   @IsUrl()
   projectUrl: string;
+
+  @ApiProperty({
+    description: 'Members of the project',
+    example: ['423242', '23124'],
+  })
+  @IsArray()
+  members: string[];
 
   @ApiProperty({
     description: 'Imagem do projeto',

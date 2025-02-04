@@ -13,6 +13,16 @@ import { deleteFile } from '../shared/deleteFiles';
 export class MemberService {
   constructor(@InjectModel(Member.name) private readonly memberModel: Model<Member>) {}
 
+  async findAll(): Promise<ResponseMember[]> {
+    try {
+      return (await this.memberModel.find()).map((m) => new ResponseMember(m));
+    } catch (error) {
+      throw new Error(
+        'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
+      );
+    }
+  }
+
   async create(memberDto: MemberDto): Promise<Member> {
     try {
       const memberFormat: Member = {
@@ -106,15 +116,5 @@ export class MemberService {
 
     await this.memberModel.updateOne({ _id: id }, { $set: memberExists });
     return memberExists;
-  }
-
-  async findAll(): Promise<ResponseMember[]> {
-    try {
-      return (await this.memberModel.find()).map((m) => new ResponseMember(m));
-    } catch (error) {
-      throw new Error(
-        'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
-      );
-    }
   }
 }

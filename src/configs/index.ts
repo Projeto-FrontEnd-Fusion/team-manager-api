@@ -2,10 +2,13 @@ import 'dotenv/config';
 
 export const EnvConfig = {
   database: {
-    MONGO_URL_DEVELOPMENT: process.env.MONGO_URL_ATLAS_DEVELOPMENT,
-    MONGO_URL_PRODUCTION: process.env.MONGO_URL_ATLAS_PRODUCTION,
+    POSTGRES_USER: process.env.POSTGRES_USER,
+    POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
+    POSTGRES_HOST: process.env.POSTGRES_HOST,
+    POSTGRES_PORT: +process.env.POSTGRES_PORT,
+    POSTGRES_DATABASE: process.env.POSTGRES_DATABASE,
+    PGDATA: process.env.PGDATA,
   },
   ENVIRONMENT: process.env.NODE_ENV,
-  PORT: +process.env.APP_PORT,
 };
 //environment

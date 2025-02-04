@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as express from 'express';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
