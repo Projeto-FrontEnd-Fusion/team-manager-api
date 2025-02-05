@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Member } from './schema/Member';
+import { Member } from 'src/entity/Member';
 import { MemberDto } from './dto/Member.dto';
 import { ResponseMember } from './dto/ResponseMember.dto';
 import { UpdateMemberDto } from './dto/UpdateMember.dto';
@@ -11,11 +11,14 @@ import { deleteFile } from '../shared/deleteFiles';
 
 @Injectable()
 export class MemberService {
-  constructor(@InjectModel(Member.name) private readonly memberModel: Model<Member>) {}
+  constructor(
+    @InjectRepository(Member)
+    private readonly memberRepository: Repository<Member>,
+  ) {}
 
   async findAll(): Promise<ResponseMember[]> {
     try {
-      return (await this.memberModel.find()).map((m) => new ResponseMember(m));
+      return (await this.memberRepository.find()).map((m) => new ResponseMember(m));
     } catch (error) {
       throw new Error(
         'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
@@ -26,7 +29,7 @@ export class MemberService {
   async create(memberDto: MemberDto): Promise<Member> {
     try {
       const memberFormat: Member = {
-        _id: uuidv4(),
+        id: uuidv4(),
         name: memberDto.name,
         profileImage: memberDto.profileImage,
         stack: memberDto.stack,
@@ -37,10 +40,10 @@ export class MemberService {
         skills: memberDto.skills,
         projects: [],
         softSkills: memberDto.softSkills,
+        createdAt: new Date().toISOString(),
       };
-      const createMember = new this.memberModel(memberFormat);
-      const member = await createMember.save();
-      return member;
+      const createMember = this.memberRepository.create(memberFormat);
+      return await this.memberRepository.save(createMember);
     } catch (error) {
       throw error;
     }
@@ -48,7 +51,7 @@ export class MemberService {
 
   async findOne(id: string): Promise<Member> {
     try {
-      const member = await this.memberModel.findById({ _id: id });
+      const member = await this.memberRepository.findOne({ where: { id: id } });
       if (!member) {
         throw new BadRequestException('Usuário não encontrado.');
       }
@@ -67,7 +70,7 @@ export class MemberService {
           await deleteFile(p.projectCover);
         }),
       );
-      await this.memberModel.deleteOne({ _id: id });
+      await this.memberRepository.delete({ id: id });
     } catch (error) {
       console.error('Erro ao criar membro:', error);
       throw error;
@@ -114,7 +117,7 @@ export class MemberService {
       memberExists.name = payload.name;
     }
 
-    await this.memberModel.updateOne({ _id: id }, { $set: memberExists });
+    await this.memberRepository.update({ id: id }, memberExists);
     return memberExists;
   }
 }

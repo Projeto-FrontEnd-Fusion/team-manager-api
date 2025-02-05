@@ -19,7 +19,7 @@ export class Member extends GenericEntity {
   @Column()
   currentSquad: string;
 
-  @Column('json')
+  @Column('simple-json')
   professionalProfile: {
     platform: string;
     url: string;
@@ -34,6 +34,10 @@ export class Member extends GenericEntity {
   @Column('simple-array')
   softSkills: string[];
 
-  @OneToMany(() => Project, (project) => project.members, { cascade: true })
+  @OneToMany(() => Project, (project) => project.members, {
+    cascade: false,
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
   projects: Project[];
 }

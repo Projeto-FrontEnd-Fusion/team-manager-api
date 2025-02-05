@@ -3,15 +3,17 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
+  HttpStatus,
   Param,
-  Patch,
+  Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { CreateProjectDto } from './dto/Project.dto';
+import { CreateProjectDto } from './dto/CreateProject.dto';
 import { ProjectService } from './project.service';
 import { multerConfig } from '@configs/multer.config';
 
@@ -20,25 +22,58 @@ import { multerConfig } from '@configs/multer.config';
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Patch(':memberId')
+  @Post()
   @UseInterceptors(FileInterceptor('file', multerConfig('project')))
-  @HttpCode(200)
+  @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: CreateProjectDto,
   })
-  async addProject(
+  async createProject(
     @UploadedFile() file: Express.Multer.File,
-    @Param('memberId') memberId: string,
     @Body() data: CreateProjectDto,
   ) {
     data.projectCover = file.path;
-    this.projectService.addProject(memberId, data);
+    this.projectService.create(data);
   }
 
-  @Delete(':id/member-id/:memberId')
-  @HttpCode(204)
-  async removeProject(@Param('id') id: string, @Param('memberId') memberId: string) {
-    this.projectService.removeProject(id, memberId);
+  @Get(':projectId')
+  @HttpCode(HttpStatus.OK)
+  async findProjectById(@Param('projectId') projectId: string) {
+    return await this.projectService.findById(projectId);
   }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async findManyProjects() {
+    return await this.projectService.findMany();
+  }
+
+  @Delete(':projectId')
+  @HttpCode(HttpStatus.OK)
+  async deleteProjectById(@Param('projetId') projectId: string) {
+    return await this.projectService.deleteById(projectId);
+  }
+
+  // @Patch(':memberId')
+  // @UseInterceptors(FileInterceptor('file', multerConfig('project')))
+  // @HttpCode(200)
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  //   type: CreateProjectDto,
+  // })
+  // async addProject(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Param('memberId') memberId: string,
+  //   @Body() data: CreateProjectDto,
+  // ) {
+  //   data.projectCover = file.path;
+  //   this.projectService.create(memberId, data);
+  // }
+
+  // @Delete(':id/member-id/:memberId')
+  // @HttpCode(204)
+  // async removeProject(@Param('id') id: string, @Param('memberId') memberId: string) {
+  //   this.projectService.removeProject(id, memberId);
+  // }
 }

@@ -1,4 +1,4 @@
-import { Member } from '../schema/Member';
+import { Member } from 'src/entity/Member';
 import { ProfissionalProfileResponse } from '../dto/ProfileResponse.dto';
 
 export function mapperProfissionalProfileToPlatformUrl(

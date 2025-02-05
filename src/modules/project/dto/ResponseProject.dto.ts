@@ -1,4 +1,4 @@
-import { Project } from '../schema/Project';
+import { Project } from 'src/entity/Project';
 
 export class ResponseProjectDto {
   id: string;
@@ -9,7 +9,7 @@ export class ResponseProjectDto {
   projectUrl: string;
 
   constructor(project: Project) {
-    this.id = project._id;
+    this.id = project.id;
     this.project_name = project.projectName;
     this.project_cover = project.projectCover;
     this.description = project.description;

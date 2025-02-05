@@ -21,7 +21,8 @@ export class Project extends GenericEntity {
 
   @ManyToMany(() => Member, (member) => member.projects, {
     cascade: true,
-    nullable: true,
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
   })
   @JoinTable()
   members: Member[];

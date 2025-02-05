@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import * as express from 'express';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
 
 import { AppModule } from './app.module';
-import { EnvConfig } from './configs';
 import { appConfig } from './configs/app.config';
 import { corsOptions } from './configs/cors';
 import { useSwagger } from './configs/useSwagger';
@@ -20,7 +20,10 @@ async function bootstrap() {
 
   useSwagger(app);
 
-  await app.listen(EnvConfig.PORT);
-  console.log(`APP STARTED ON PORT: ${EnvConfig.PORT}`);
+  const configService = app.get(ConfigService);
+
+  const PORT = configService.get<string>('PORT');
+  await app.listen(PORT);
+  console.log(`APP STARTED ON PORT: ${PORT}`);
 }
 bootstrap();

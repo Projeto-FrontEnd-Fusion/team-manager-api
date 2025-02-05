@@ -8,5 +8,5 @@ export abstract class GenericEntity {
   createdAt: string;
 
   @Column({ nullable: true })
-  updatedAt: string;
+  updatedAt?: string;
 }

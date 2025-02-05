@@ -1,8 +1,11 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+
 import { Member } from 'src/entity/Member';
 import { Project } from 'src/entity/Project';
 
+@Injectable()
 export class PostgresConfigService implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
@@ -16,7 +19,6 @@ export class PostgresConfigService implements TypeOrmOptionsFactory {
       database: this.configService.get<string>('POSTGRES_DATABASE'),
       entities: [Member, Project],
       synchronize: true,
-      logging: true,
     };
   }
 }

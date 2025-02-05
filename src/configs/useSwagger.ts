@@ -6,9 +6,7 @@ function useSwagger(app: INestApplication): void {
     .setTitle('Back-end fusion')
     .setDescription('Fusion do projeto colaborativo do fusion.')
     .setVersion('1.0')
-    .addTag('fusion')
-    .addTag('member')
-    .addTag('projects')
+    .addTag('Back-end Fusion')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

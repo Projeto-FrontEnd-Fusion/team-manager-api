@@ -1,4 +1,4 @@
-import { Member } from '../schema/Member';
+import { Member } from 'src/entity/Member';
 import { ProfissionalProfileResponse } from './ProfileResponse.dto';
 import { ResponseProjectDto } from '@modules/project/dto/ResponseProject.dto';
 import { mapperProfissionalProfileToPlatformUrl } from '../util/mapperToPlataformUrl';
@@ -16,7 +16,7 @@ export class ResponseMember {
   soft_skills: string[];
 
   constructor(member: Member) {
-    this.id = member._id;
+    this.id = member.id;
     this.name = member.name;
     this.profile_image = member.profileImage;
     this.stack = member.stack;
