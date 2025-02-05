@@ -13,10 +13,11 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { MemberDto } from './dto/Member.dto';
+import { CreateMemberDto } from './dto/CreateMember.dto';
+import { Member } from 'src/entity/Member';
 import { MemberService } from './member.service';
 import { ResponseMember } from './dto/ResponseMember.dto';
-import { UpdateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
 
 @ApiTags('Members')
@@ -29,11 +30,11 @@ export class MemberController {
   @HttpCode(201)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    type: MemberDto,
+    type: CreateMemberDto,
   })
   async create(
     @UploadedFile() file: Express.Multer.File,
-    @Body() data: MemberDto,
+    @Body() data: CreateMemberDto,
   ): Promise<ResponseMember> {
     try {
       data.profileImage = file.path;
@@ -45,19 +46,19 @@ export class MemberController {
 
   @Get('/find-all')
   @HttpCode(200)
-  async findAll(): Promise<ResponseMember[]> {
+  async findAll(): Promise<Member[]> {
     try {
-      return await this.memberService.findAll();
+      return await this.memberService.findMany();
     } catch (error) {
       throw error;
     }
   }
 
-  @Get(':id')
+  @Get(':memberId')
   @HttpCode(200)
-  async findOne(@Param('id') id: string): Promise<ResponseMember> {
+  async findById(@Param('memberId') memberId: string): Promise<Member> {
     try {
-      return new ResponseMember(await this.memberService.findOne(id));
+      return await this.memberService.findById(memberId);
     } catch (error) {
       throw error;
     }
@@ -68,11 +69,11 @@ export class MemberController {
   @HttpCode(200)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    type: UpdateMemberDto,
+    type: UpdateCreateMemberDto,
   })
   async update(
     @Param('id') id: string,
-    @Body() updates: UpdateMemberDto,
+    @Body() updates: UpdateCreateMemberDto,
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<ResponseMember> {
     try {

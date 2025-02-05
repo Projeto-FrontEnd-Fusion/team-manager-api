@@ -1,7 +1,7 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateMemberDto {
+export class UpdateCreateMemberDto {
   @ApiProperty({ description: 'Name of the member', required: false })
   @IsOptional()
   @IsString()

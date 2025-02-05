@@ -3,10 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
+import { CreateMemberDto } from './dto/CreateMember.dto';
 import { Member } from 'src/entity/Member';
-import { MemberDto } from './dto/Member.dto';
-import { ResponseMember } from './dto/ResponseMember.dto';
-import { UpdateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { deleteFile } from '../shared/deleteFiles';
 
 @Injectable()
@@ -16,9 +15,9 @@ export class MemberService {
     private readonly memberRepository: Repository<Member>,
   ) {}
 
-  async findAll(): Promise<ResponseMember[]> {
+  async findMany(): Promise<Member[]> {
     try {
-      return (await this.memberRepository.find()).map((m) => new ResponseMember(m));
+      return await this.memberRepository.find();
     } catch (error) {
       throw new Error(
         'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
@@ -26,30 +25,30 @@ export class MemberService {
     }
   }
 
-  async create(memberDto: MemberDto): Promise<Member> {
+  async create(payload: CreateMemberDto): Promise<Member> {
     try {
-      const memberFormat: Member = {
+      const newMember: Member = {
         id: uuidv4(),
-        name: memberDto.name,
-        profileImage: memberDto.profileImage,
-        stack: memberDto.stack,
-        communityLevel: memberDto.communityLevel,
-        currentSquad: memberDto.currentSquad,
-        professionalProfile: memberDto.professionalProfile,
-        platform: memberDto.platform,
-        skills: memberDto.skills,
+        name: payload.name,
+        profileImage: payload.profileImage,
+        stack: payload.stack,
+        communityLevel: payload.communityLevel,
+        currentSquad: payload.currentSquad,
+        professionalProfile: payload.professionalProfile,
+        platform: payload.platform,
+        skills: payload.skills,
         projects: [],
-        softSkills: memberDto.softSkills,
+        softSkills: payload.softSkills,
         createdAt: new Date().toISOString(),
       };
-      const createMember = this.memberRepository.create(memberFormat);
+      const createMember = this.memberRepository.create(newMember);
       return await this.memberRepository.save(createMember);
     } catch (error) {
       throw error;
     }
   }
 
-  async findOne(id: string): Promise<Member> {
+  async findById(id: string): Promise<Member> {
     try {
       const member = await this.memberRepository.findOne({ where: { id: id } });
       if (!member) {
@@ -63,7 +62,7 @@ export class MemberService {
 
   async delete(id: string): Promise<void> {
     try {
-      const member = await this.findOne(id);
+      const member = await this.findById(id);
       await deleteFile(member.profileImage);
       await Promise.all(
         member.projects.map(async (p) => {
@@ -77,8 +76,8 @@ export class MemberService {
     }
   }
 
-  async update(id: string, payload: UpdateMemberDto): Promise<Member> {
-    const memberExists = await this.findOne(id);
+  async update(id: string, payload: UpdateCreateMemberDto): Promise<Member> {
+    const memberExists = await this.findById(id);
 
     if (payload.profileImage && payload.profileImage !== memberExists.profileImage) {
       await deleteFile(memberExists.profileImage);
