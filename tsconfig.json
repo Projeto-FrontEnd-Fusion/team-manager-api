@@ -24,7 +24,8 @@
       "@infra/*": ["./src/infra/*"],
       "@configs/*": ["./src/configs/*"],
       "@test/*": ["./test/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@entity/*": ["./src/entity/*"]
     }
   }
 }

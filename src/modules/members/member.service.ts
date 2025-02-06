@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CreateMemberDto } from './dto/CreateMember.dto';
-import { Member } from 'src/entity/Member';
+import { Member } from '@entity/Member';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { deleteFile } from '../shared/deleteFiles';
 

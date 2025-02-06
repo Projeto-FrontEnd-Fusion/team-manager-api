@@ -1,162 +1,110 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { v4 as uuidv4 } from 'uuid';
+import { BadRequestException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { MemberController } from './member.controller';
+import { CreateMemberDto } from './dto/CreateMember.dto';
+import { Member } from '@entity/Member';
 import { MemberService } from './member.service';
-// import { ProfissionalProfileResponse } from './dto/ProfileResponse.dto';
-// import { ResponseMember } from './dto/ResponseMember.dto';
-// import { ResponseProjectDto } from '../project/dto/ResponseProject.dto';
-// import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
-import { Member } from 'src/entity/Member';
+import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { deleteFile } from '../shared/deleteFiles';
 
-describe('MemberController', () => {
-  let controller: MemberController;
+jest.mock('../shared/deleteFiles');
+
+describe('MemberService', () => {
   let service: MemberService;
-
-  const member = {
-    id: uuidv4(),
-    name: 'John Doe',
-    stack: 'Fullstack',
-    communityLevel: 'Senior',
-    professionalProfile: {
-      platform: 'linkedin',
-      url: 'https://linkedin.com/meu-perfil',
-    },
-    platform: ['linkedin'],
-    currentSquad: 'Alpha Squad',
-    skills: ['JavaScript', 'TypeScript'],
-    softSkills: ['Communication', 'Teamwork'],
-    file: { name: 'teste' },
-    projects: [
-      {
-        id: uuidv4(),
-        projectName: 'Team Manager API',
-        projectCover: 'cover.jpg',
-        description: 'Team Managar API dos Vingadores',
-        technologies: ['typescript', 'nestjs'],
-        projectUrl: 'www.teammanagarapi.vingadores.com.br',
-        members: [],
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    profileImage: 'image.jpg',
-    createdAt: new Date().toISOString(),
-  };
+  let repository: Repository<Member>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [MemberController],
       providers: [
+        MemberService,
         {
-          provide: MemberService,
-          useValue: {
-            create: jest.fn(),
-            findAll: jest.fn(),
-            findOne: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
-          },
+          provide: getRepositoryToken(Member),
+          useClass: Repository,
         },
       ],
     }).compile();
 
-    controller = module.get<MemberController>(MemberController);
     service = module.get<MemberService>(MemberService);
+    repository = module.get<Repository<Member>>(getRepositoryToken(Member));
   });
 
-  describe('create', () => {
-    it('should call service.create with the received CreateMemberDto and return the result', async () => {
-      const responseMember: Member = member;
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-      jest.spyOn(service, 'create').mockResolvedValue(responseMember);
+  describe('findMany', () => {
+    it('should return an array of members', async () => {
+      const members: Member[] = [{ id: '1', name: 'John Doe' } as Member];
+      jest.spyOn(repository, 'find').mockResolvedValue(members);
 
-      // TODO: Fix Path
-      const file = { path: 'path/to/file' } as Express.Multer.File;
-      const result = await controller.create(file, member);
+      expect(await service.findMany()).toEqual(members);
+    });
 
-      expect(service.create).toHaveBeenCalledWith(member);
-      expect(result).toEqual(responseMember);
+    it('should throw an error if repository fails', async () => {
+      jest.spyOn(repository, 'find').mockRejectedValue(new Error('Error'));
+
+      await expect(service.findMany()).rejects.toThrow(
+        'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
+      );
     });
   });
 
-  // describe('findAll', () => {
-  //   it('should call service.findAll and return the result', async () => {
-  //     const responseMembers: ResponseMember[] = [
-  //       {
-  //         id: uuidv4(),
-  //         name: 'John Doe',
-  //         stack: 'Fullstack',
-  //         community_level: 'Senior',
-  //         current_squad: 'Alpha Squad',
-  //         skills: ['JavaScript', 'TypeScript'],
-  //         soft_skills: ['Communication', 'Teamwork'],
-  //         professional_profile_url: [new ProfissionalProfileResponse('github', 'url')],
-  //         projects: [
-  //           new ResponseProjectDto({
-  //             _id: '12345',
-  //             projectName: 'Team Manager API',
-  //             projectCover: 'cover.jpg',
-  //             description: 'Team Managar API dos Vingadores',
-  //             technologies: ['typescript', 'nestjs'],
-  //             projectUrl: 'www.teammanagarapi.vingadores.com.br',
-  //           }),
-  //         ],
-  //         profile_image: 'image.jpg',
-  //       },
-  //     ];
+  describe('create', () => {
+    it('should create a new member', async () => {
+      const payload: CreateMemberDto = { name: 'John Doe' } as CreateMemberDto;
+      const member: Member = { id: '1', name: 'John Doe' } as Member;
+      jest.spyOn(repository, 'create').mockReturnValue(member);
+      jest.spyOn(repository, 'save').mockResolvedValue(member);
 
-  //     jest.spyOn(service, 'findAll').mockResolvedValue(responseMembers);
+      expect(await service.create(payload)).toEqual(member);
+    });
+  });
 
-  //     const result = await controller.findAll();
+  describe('findById', () => {
+    it('should return a member by id', async () => {
+      const member: Member = { id: '1', name: 'John Doe' } as Member;
+      jest.spyOn(repository, 'findOne').mockResolvedValue(member);
 
-  //     expect(service.findAll).toHaveBeenCalled();
-  //     expect(result).toEqual(responseMembers);
-  //   });
-  // });
+      expect(await service.findById('1')).toEqual(member);
+    });
 
-  // describe('findOne', () => {
-  //   it('should call service.findOne with the given id and return the result', async () => {
-  //     const memberId = '60d0fe4f5311236168a109ca';
+    it('should throw BadRequestException if member not found', async () => {
+      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
 
-  //     jest.spyOn(service, 'findOne').mockResolvedValue(member);
+      await expect(service.findById('1')).rejects.toThrow(BadRequestException);
+    });
+  });
 
-  //     const result = await controller.findOne(memberId);
+  describe('delete', () => {
+    it('should delete a member by id', async () => {
+      const member: Member = {
+        id: '1',
+        profileImage: 'image.jpg',
+        projects: [],
+      } as Member;
+      jest.spyOn(service, 'findById').mockResolvedValue(member);
+      jest.spyOn(repository, 'delete').mockResolvedValue(undefined);
 
-  //     expect(service.findOne).toHaveBeenCalledWith(memberId);
-  //     expect(result).toEqual(member);
-  //   });
-  // });
+      await service.delete('1');
+      expect(deleteFile).toHaveBeenCalledWith('image.jpg');
+      expect(repository.delete).toHaveBeenCalledWith({ id: '1' });
+    });
+  });
 
-  // describe('update', () => {
-  //   it('should call service.update with the given id and UpdateCreateMemberDto and return void', async () => {
-  //     const id = '12345';
-  //     const updateCreateMemberDto: UpdateCreateMemberDto = {
-  //       name: 'John Updated',
-  //       stack: 'Backend',
-  //       communityLevel: 'Junior',
-  //       professionalProfile: {
-  //         platform: 'linkedin',
-  //         url: 'https://linkedin.com/meu-perfil',
-  //       },
-  //       platform: ['platform'],
-  //       currentSquad: 'Beta Squad',
-  //       skills: ['Node.js', 'Express'],
-  //       softSkills: ['Adaptability', 'Leadership'],
-  //     };
+  describe('update', () => {
+    it('should update a member', async () => {
+      const member: Member = { id: '1', name: 'John Doe' } as Member;
+      const payload: UpdateCreateMemberDto = {
+        name: 'Jane Doe',
+      } as UpdateCreateMemberDto;
+      jest.spyOn(service, 'findById').mockResolvedValue(member);
+      jest.spyOn(repository, 'update').mockResolvedValue(undefined);
 
-  //     jest.spyOn(service, 'update').mockResolvedValue(undefined);
-
-  //     await controller.update(id, updateCreateMemberDto);
-
-  //     expect(service.update).toHaveBeenCalledWith(id, updateCreateMemberDto);
-  //   });
-  // });
-
-  // describe('delete', () => {
-  //   it('should call service.delete with the given id and return void', async () => {
-  //     jest.spyOn(service, 'delete').mockResolvedValue(undefined);
-  //     await controller.delete('12345');
-  //     expect(service.delete).toHaveBeenCalledWith('12345');
-  //   });
-  // });
+      const updatedMember = await service.update('1', payload);
+      expect(updatedMember.name).toEqual('Jane Doe');
+      expect(repository.update).toHaveBeenCalledWith({ id: '1' }, updatedMember);
+    });
+  });
 });
