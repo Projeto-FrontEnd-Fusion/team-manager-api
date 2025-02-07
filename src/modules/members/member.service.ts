@@ -15,34 +15,21 @@ export class MemberService {
     private readonly memberRepository: Repository<Member>,
   ) {}
 
-  async findMany(): Promise<Member[]> {
-    try {
-      return await this.memberRepository.find();
-    } catch (error) {
-      throw new Error(
-        'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
-      );
-    }
-  }
-
   async create(payload: CreateMemberDto): Promise<Member> {
     try {
-      const newMember: Member = {
+      const newMember = this.memberRepository.create({
+        ...payload,
         id: uuidv4(),
-        name: payload.name,
-        profileImage: payload.profileImage,
-        stack: payload.stack,
-        communityLevel: payload.communityLevel,
-        currentSquad: payload.currentSquad,
-        professionalProfile: payload.professionalProfile,
-        platform: payload.platform,
-        skills: payload.skills,
-        projects: [],
-        softSkills: payload.softSkills,
         createdAt: new Date().toISOString(),
-      };
-      const createMember = this.memberRepository.create(newMember);
-      return await this.memberRepository.save(createMember);
+        professionalProfile: payload.professionalProfile.map((profile) => ({
+          ...profile,
+          id: uuidv4(),
+          member: null,
+          createdAt: new Date().toISOString(),
+        })),
+      });
+
+      return await this.memberRepository.save(newMember);
     } catch (error) {
       throw error;
     }
@@ -50,13 +37,25 @@ export class MemberService {
 
   async findById(id: string): Promise<Member> {
     try {
-      const member = await this.memberRepository.findOne({ where: { id: id } });
+      const member = await this.memberRepository.findOne({
+        where: { id: id },
+      });
       if (!member) {
         throw new BadRequestException('Usuário não encontrado.');
       }
       return member;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async findMany(): Promise<Member[]> {
+    try {
+      return await this.memberRepository.find();
+    } catch (error) {
+      throw new Error(
+        'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
+      );
     }
   }
 
@@ -77,7 +76,9 @@ export class MemberService {
   }
 
   async update(id: string, payload: UpdateCreateMemberDto): Promise<Member> {
-    const memberExists = await this.findById(id);
+    const memberExists = await this.memberRepository.findOne({
+      where: { id: id },
+    });
 
     if (payload.profileImage && payload.profileImage !== memberExists.profileImage) {
       await deleteFile(memberExists.profileImage);
@@ -95,13 +96,6 @@ export class MemberService {
 
     if (payload.currentSquad && payload.currentSquad !== '') {
       memberExists.currentSquad = payload.currentSquad;
-    }
-
-    memberExists.professionalProfile =
-      payload.professionalProfile || memberExists.professionalProfile;
-
-    if (payload.platform && payload.platform.length > 0) {
-      memberExists.platform = payload.platform;
     }
 
     if (payload.skills && payload.skills.length > 0) {

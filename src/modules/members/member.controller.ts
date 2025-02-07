@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -16,7 +17,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { Member } from 'src/entity/Member';
 import { MemberService } from './member.service';
-import { ResponseMember } from './dto/ResponseMember.dto';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
 
@@ -32,19 +32,16 @@ export class MemberController {
   @ApiBody({
     type: CreateMemberDto,
   })
-  async create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() data: CreateMemberDto,
-  ): Promise<ResponseMember> {
+  async create(@UploadedFile() file: Express.Multer.File, @Body() data: CreateMemberDto) {
     try {
       data.profileImage = file.path;
-      return new ResponseMember(await this.memberService.create(data));
+      return await this.memberService.create(data);
     } catch (error) {
       throw error;
     }
   }
 
-  @Get('/find-all')
+  @Get()
   @HttpCode(200)
   async findAll(): Promise<Member[]> {
     try {
@@ -66,28 +63,28 @@ export class MemberController {
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file', multerConfig('member')))
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UpdateCreateMemberDto,
   })
   async update(
     @Param('id') id: string,
-    @Body() updates: UpdateCreateMemberDto,
+    @Body() payload: UpdateCreateMemberDto,
     @UploadedFile() file?: Express.Multer.File,
-  ): Promise<ResponseMember> {
+  ) {
     try {
       if (file) {
-        updates.profileImage = file.path;
+        payload.profileImage = file.path;
       }
-      return new ResponseMember(await this.memberService.update(id, updates));
+      return await this.memberService.update(id, payload);
     } catch (error) {
       throw error;
     }
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.OK)
   async delete(@Param('id') id: string): Promise<void> {
     try {
       await this.memberService.delete(id);

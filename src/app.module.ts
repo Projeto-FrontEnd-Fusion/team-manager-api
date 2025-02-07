@@ -5,11 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostgresConfigService } from 'src/infra/typeorm/postgres.config.service';
-import { ProjectModule } from './modules/project/project.module';
+
+import { MemberModule } from '@modules/members/member.module';
+import { MemberProjectModule } from '@modules/member_project/member_project.module';
+import { ProjectModule } from '@modules/project/project.module';
 
 @Module({
   imports: [
     ProjectModule,
+    MemberModule,
+    MemberProjectModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

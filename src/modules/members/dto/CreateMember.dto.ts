@@ -1,5 +1,23 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProfessionalProfile } from '@entity/ProfessionalProfile';
+import { Type } from 'class-transformer';
+
+class ProfessionalProfileDto {
+  @ApiProperty({ example: 'linkedin' })
+  @IsString()
+  platform: string;
+
+  @ApiProperty({ example: 'https://linkedin.com/seunome' })
+  @IsString()
+  url: string;
+}
 
 export class CreateMemberDto {
   @ApiProperty({ description: 'Name of the member', example: 'John Doe' })
@@ -32,23 +50,14 @@ export class CreateMemberDto {
   currentSquad: string;
 
   @ApiProperty({
+    type: [ProfessionalProfileDto],
     description: 'Your professional profile with URL linkedin',
-    example: { plataform: 'linkedin', url: 'https://linkedin.com/seunome' },
+    example: { platform: 'linkedin', url: 'https://linkedin.com/seunome' },
   })
-  @IsNotEmpty()
-  @IsString()
-  professionalProfile: {
-    platform: string;
-    url: string;
-  };
-
-  @ApiProperty({
-    description: 'Your professional platform',
-    example: 'github, linkedin',
-  })
-  @IsNotEmpty()
-  @IsString()
-  platform: string[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProfessionalProfileDto)
+  professionalProfile: ProfessionalProfile[];
 
   @ApiProperty({
     description: 'Technical skills',

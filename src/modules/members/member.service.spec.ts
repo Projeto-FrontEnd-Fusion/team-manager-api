@@ -2,10 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { Member } from '@entity/Member';
 import { MemberService } from './member.service';
+import { ProfessionalProfile } from '@entity/ProfessionalProfile';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { deleteFile } from '../shared/deleteFiles';
 
@@ -21,6 +23,10 @@ describe('MemberService', () => {
         MemberService,
         {
           provide: getRepositoryToken(Member),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(ProfessionalProfile),
           useClass: Repository,
         },
       ],
@@ -53,7 +59,24 @@ describe('MemberService', () => {
 
   describe('create', () => {
     it('should create a new member', async () => {
-      const payload: CreateMemberDto = { name: 'John Doe' } as CreateMemberDto;
+      const payload: CreateMemberDto = {
+        name: 'John Doe',
+        profileImage: '',
+        stack: 'Full Stack',
+        communityLevel: 'Senior',
+        currentSquad: 'Eagles',
+        skills: ['Java', 'JavaScript'],
+        softSkills: ['Comunicativo', 'Atencioso', 'Prestativo'],
+        professionalProfile: [
+          {
+            id: uuidv4(),
+            platform: 'linkedin',
+            url: 'https://linkedin.com/seunome',
+            member: null, // O TypeORM associará o `member` automaticamente
+            createdAt: new Date().toISOString(),
+          },
+        ],
+      };
       const member: Member = { id: '1', name: 'John Doe' } as Member;
       jest.spyOn(repository, 'create').mockReturnValue(member);
       jest.spyOn(repository, 'save').mockResolvedValue(member);
@@ -99,7 +122,7 @@ describe('MemberService', () => {
       const payload: UpdateCreateMemberDto = {
         name: 'Jane Doe',
       } as UpdateCreateMemberDto;
-      jest.spyOn(service, 'findById').mockResolvedValue(member);
+      jest.spyOn(repository, 'findOne').mockResolvedValue(member);
       jest.spyOn(repository, 'update').mockResolvedValue(undefined);
 
       const updatedMember = await service.update('1', payload);
