@@ -9,11 +9,16 @@ export class CreateProjectDto {
   })
   @IsNotEmpty()
   @IsString()
-  projectName: string;
+  name: string;
 
+  @ApiProperty({
+    description: 'Url from the image cover of the project',
+    maxLength: 250,
+    example: 'https://avatars.githubusercontent.com/u/161888104?s=200&v=4',
+  })
   @IsOptional()
   @IsString()
-  projectCover: string;
+  cover?: string;
 
   @ApiProperty({
     description: 'Description of your project',
@@ -27,11 +32,10 @@ export class CreateProjectDto {
   @ApiProperty({
     description: 'Technologies used in the project',
     maxLength: 250,
-    example: ['Java, JavaScript, Python'],
+    example: 'Java, JavaScript, Python',
   })
   @IsArray()
-  @IsNotEmpty()
-  technologies: string[];
+  technologies?: string;
 
   @ApiProperty({
     description: 'URL of the project',
@@ -39,7 +43,7 @@ export class CreateProjectDto {
   })
   @IsNotEmpty()
   @IsUrl()
-  projectUrl: string;
+  url: string;
 
   @ApiProperty({
     description: 'Members of the project',

@@ -6,7 +6,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ProfessionalProfile } from '@entity/ProfessionalProfile';
 import { Type } from 'class-transformer';
 
 class ProfessionalProfileDto {
@@ -52,12 +51,12 @@ export class CreateMemberDto {
   @ApiProperty({
     type: [ProfessionalProfileDto],
     description: 'Your professional profile with URL linkedin',
-    example: { platform: 'linkedin', url: 'https://linkedin.com/seunome' },
+    example: [{ platform: 'linkedin', url: 'https://linkedin.com/seunome' }],
   })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProfessionalProfileDto)
-  professionalProfile: ProfessionalProfile[];
+  professionalProfile: ProfessionalProfileDto[];
 
   @ApiProperty({
     description: 'Technical skills',
@@ -83,6 +82,10 @@ export class CreateMemberDto {
   @IsOptional()
   file?: any;
 
+  @ApiProperty({
+    type: String,
+    required: false,
+  })
   @IsOptional()
   @IsString()
   profileImage?: string;
