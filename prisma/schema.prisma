@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRoles {
+  ADMIM
+  USER
+}
+
+model User {
+  id        String    @id
+  email     String    @unique
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  password  String
+  age       Int
+  role      UserRoles
+  createdAt String
+}
+
+model Member {
+  id             String  @id
+  name           String
+  stack          String
+  communityLevel String  @map("community_level")
+  currentSquad   String  @map("current_squad")
+  profileImage   String?
+  createdAt      String
+
+  professionalProfiles ProfessionalProfile[]
+  projects             Projects[]
+  SkillsMembers        SkillsMembers[]
+  SoftSkillsMembers    SoftSkillsMembers[]
+}
+
+model ProfessionalProfile {
+  id        String  @id
+  platform  String
+  url       String
+  member    Member? @relation(fields: [memberId], references: [id])
+  memberId  String? @map("member_id")
+  createdAt String  @map("created_at")
+}
+
+model Projects {
+  id           String   @id
+  name         String
+  cover        String?
+  description  String
+  technologies String
+  url          String
+  members      Member[]
+  createdAt    String   @map("created_at")
+}
+
+model Skills {
+  id            String          @id
+  name          String          @unique
+  description   String
+  createdAt     String          @map("created_at")
+  memberId      String?
+  SkillsMembers SkillsMembers[]
+}
+
+model SoftSkills {
+  id                String              @id
+  name              String              @unique
+  description       String              @unique
+  createdAt         String              @map("created_at")
+  memberId          String?
+  SoftSkillsMembers SoftSkillsMembers[]
+}
+
+/// Tabela intermediária para a relação muitos-para-muitos entre Member e Skills
+model SkillsMembers {
+  memberId String
+  skillId  String
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  skill  Skills @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, skillId]) // Chave composta para garantir unicidade
+}
+
+/// Tabela intermediária para a relação muitos-para-muitos entre Member e SoftSkills
+model SoftSkillsMembers {
+  memberId    String
+  softSkillId String
+
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  softSkill SoftSkills @relation(fields: [softSkillId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, softSkillId]) // Chave composta para garantir unicidade
+}
+
+model Logs {
+  id        Int    @id @default(autoincrement())
+  message   String
+  createdAt String
+}
