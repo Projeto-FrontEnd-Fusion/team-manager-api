@@ -1,48 +1,45 @@
-import { v4 as uuidv4 } from 'uuid';
-
-import { ProfissionalProfileResponse } from '@modules/members/dto/ProfileResponse.dto';
-import { ResponseMember } from '@modules/members/dto/ResponseMember.dto';
-import { ResponseProjectDto } from '@modules/project/dto/ResponseProject.dto';
-
 export class InMemoryMemberRepository {
-  public responseMember: ResponseMember[] = [
+  public responseMember = [
     {
-      id: uuidv4(),
+      id: '1',
       name: 'John Doe',
       stack: 'Fullstack',
-      community_level: 'Senior',
-      current_squad: 'Alpha Squad',
+      communityLevel: 'Senior',
+      currentSquad: 'Alpha Squad',
       skills: ['JavaScript', 'TypeScript'],
-      soft_skills: ['Communication', 'Teamwork'],
-      professional_profile_url: [new ProfissionalProfileResponse('github', 'url')],
+      softSkills: ['Communication', 'Teamwork'],
+      professionalProfile: [],
       projects: [
-        new ResponseProjectDto({
-          _id: '12345',
+        {
+          id: '12345',
           projectName: 'Team Manager API',
           projectCover: 'cover.jpg',
           description: 'Team Managar API dos Vingadores',
           technologies: ['typescript', 'nestjs'],
           projectUrl: 'www.teammanagarapi.vingadores.com.br',
-        }),
+          members: [],
+          createdAt: new Date().toISOString(),
+        },
       ],
-      profile_image: 'image.jpg',
+      profileImage: 'image.jpg',
+      createdAt: new Date().toISOString(),
     },
   ];
 
-  async create(responseMember: ResponseMember): Promise<void> {
-    this.responseMember.push(responseMember);
+  async create(payload): Promise<void> {
+    this.responseMember.push(payload);
   }
 
-  async save(item: ResponseMember): Promise<void> {
+  async save(item): Promise<void> {
     const index = this.responseMember.findIndex(({ id }) => id === item.id);
     this.responseMember[index] = item;
   }
 
-  async findById(itemId: string): Promise<ResponseMember | null> {
+  async findById(itemId: string) {
     return this.responseMember.find(({ id }) => id === itemId) ?? null;
   }
 
-  async findAll(): Promise<ResponseMember[] | []> {
+  async findAll() {
     return this.responseMember;
   }
 
