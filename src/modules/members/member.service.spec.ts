@@ -1,133 +1,151 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
-import { CreateMemberDto } from './dto/CreateMember.dto';
-import { Member } from '@entity/Member';
 import { MemberService } from './member.service';
-import { ProfessionalProfile } from '@entity/ProfessionalProfile';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
-import { deleteFile } from '../shared/deleteFiles';
+import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
+// import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { deleteFile } from '@modules/shared/deleteFiles';
 
-jest.mock('../shared/deleteFiles');
+jest.mock('@modules/shared/deleteFiles');
 
 describe('MemberService', () => {
   let service: MemberService;
-  let repository: Repository<Member>;
+  let prismaService: PrismaService;
+  let member;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        MemberService,
-        {
-          provide: getRepositoryToken(Member),
-          useClass: Repository,
-        },
-        {
-          provide: getRepositoryToken(ProfessionalProfile),
-          useClass: Repository,
-        },
-      ],
+      imports: [PrismaModule],
+      providers: [MemberService],
     }).compile();
 
     service = module.get<MemberService>(MemberService);
-    repository = module.get<Repository<Member>>(getRepositoryToken(Member));
+    prismaService = module.get<PrismaService>(PrismaService);
+
+    jest.spyOn(prismaService.member, 'create').mockImplementation(jest.fn());
+    jest.spyOn(prismaService.member, 'findFirst').mockImplementation(jest.fn());
+    jest.spyOn(prismaService.member, 'findMany').mockImplementation(jest.fn());
+    jest.spyOn(prismaService.member, 'delete').mockImplementation(jest.fn());
+    jest.spyOn(prismaService.member, 'update').mockImplementation(jest.fn());
+
+    member = {
+      name: 'John Doe',
+      profileImage: '',
+      stack: 'Full Stack',
+      communityLevel: 'Senior',
+      currentSquad: 'Eagles',
+      skills: [],
+      softSkills: [],
+      projects: [],
+      professionalProfiles: [
+        {
+          platform: 'linkedin',
+          url: 'https://linkedin.com/seunome',
+        },
+      ],
+    };
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('findMany', () => {
-    it('should return an array of members', async () => {
-      const members: Member[] = [{ id: '1', name: 'John Doe' } as Member];
-      jest.spyOn(repository, 'find').mockResolvedValue(members);
-
-      expect(await service.findMany()).toEqual(members);
-    });
-
-    it('should throw an error if repository fails', async () => {
-      jest.spyOn(repository, 'find').mockRejectedValue(new Error('Error'));
-
-      await expect(service.findMany()).rejects.toThrow(
-        'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
-      );
-    });
-  });
-
   describe('create', () => {
     it('should create a new member', async () => {
-      const payload: CreateMemberDto = {
-        name: 'John Doe',
-        profileImage: '',
-        stack: 'Full Stack',
-        communityLevel: 'Senior',
-        currentSquad: 'Eagles',
-        skills: ['Java', 'JavaScript'],
-        softSkills: ['Comunicativo', 'Atencioso', 'Prestativo'],
-        professionalProfile: [
-          {
-            id: uuidv4(),
-            platform: 'linkedin',
-            url: 'https://linkedin.com/seunome',
-            member: null, // O TypeORM associará o `member` automaticamente
-            createdAt: new Date().toISOString(),
-          },
-        ],
-      };
-      const member: Member = { id: '1', name: 'John Doe' } as Member;
-      jest.spyOn(repository, 'create').mockReturnValue(member);
-      jest.spyOn(repository, 'save').mockResolvedValue(member);
+      jest.spyOn(prismaService.member, 'create').mockResolvedValue(member);
 
-      expect(await service.create(payload)).toEqual(member);
-    });
-  });
+      const response = await service.create(member);
 
-  describe('findById', () => {
-    it('should return a member by id', async () => {
-      const member: Member = { id: '1', name: 'John Doe' } as Member;
-      jest.spyOn(repository, 'findOne').mockResolvedValue(member);
-
-      expect(await service.findById('1')).toEqual(member);
+      expect(response).toBeDefined();
+      expect(prismaService.member.create).toHaveBeenCalled();
+      expect(response.name).toBe('John Doe');
     });
 
-    it('should throw BadRequestException if member not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+    it('should throw an error if creation fails', async () => {
+      const payload = { name: 'John Doe' };
+      (prismaService.member.create as jest.Mock).mockRejectedValue(new Error('Error'));
 
-      await expect(service.findById('1')).rejects.toThrow(BadRequestException);
+      await expect(service.create(payload)).rejects.toThrow(Error);
     });
-  });
 
-  describe('delete', () => {
-    it('should delete a member by id', async () => {
-      const member: Member = {
-        id: '1',
-        profileImage: 'image.jpg',
-        projects: [],
-      } as Member;
-      jest.spyOn(service, 'findById').mockResolvedValue(member);
-      jest.spyOn(repository, 'delete').mockResolvedValue(undefined);
+    describe('findById', () => {
+      it('should return a member by id', async () => {
+        const member = {
+          id: '1',
+          name: 'John Doe',
+        };
+        (prismaService.member.findFirst as jest.Mock).mockResolvedValue(member);
 
-      await service.delete('1');
-      expect(deleteFile).toHaveBeenCalledWith('image.jpg');
-      expect(repository.delete).toHaveBeenCalledWith({ id: '1' });
+        expect(await service.findById('1')).toEqual(member);
+      });
+
+      it('should throw BadRequestException if member not found', async () => {
+        (prismaService.member.findFirst as jest.Mock).mockResolvedValue(null);
+
+        await expect(service.findById('1')).rejects.toThrow(BadRequestException);
+      });
     });
-  });
 
-  describe('update', () => {
-    it('should update a member', async () => {
-      const member: Member = { id: '1', name: 'John Doe' } as Member;
-      const payload: UpdateCreateMemberDto = {
-        name: 'Jane Doe',
-      } as UpdateCreateMemberDto;
-      jest.spyOn(repository, 'findOne').mockResolvedValue(member);
-      jest.spyOn(repository, 'update').mockResolvedValue(undefined);
+    describe('findMany', () => {
+      it('should return an array of members', async () => {
+        const members = [{ id: '1', name: 'John Doe' }];
+        (prismaService.member.findMany as jest.Mock).mockResolvedValue(members);
 
-      const updatedMember = await service.update('1', payload);
-      expect(updatedMember.name).toEqual('Jane Doe');
-      expect(repository.update).toHaveBeenCalledWith({ id: '1' }, updatedMember);
+        expect(await service.findMany()).toEqual(members);
+      });
+
+      it('should throw an error if repository fails', async () => {
+        (prismaService.member.findMany as jest.Mock).mockRejectedValue(
+          new Error('Error'),
+        );
+
+        await expect(service.findMany()).rejects.toThrow(
+          'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
+        );
+      });
+    });
+
+    describe('delete', () => {
+      it('should delete a member by id', async () => {
+        const member = {
+          id: '1',
+          name: '',
+          stack: '',
+          communityLevel: '',
+          currentSquad: '',
+          createdAt: '',
+          profileImage: 'image.jpg',
+        };
+        jest.spyOn(prismaService.member, 'findFirst').mockResolvedValue(member);
+        jest.spyOn(prismaService.member, 'delete').mockResolvedValue(undefined);
+        (deleteFile as jest.Mock).mockResolvedValue(undefined);
+
+        await service.delete('1');
+
+        expect(deleteFile).toHaveBeenCalledWith('image.jpg');
+        expect(prismaService.member.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+      });
+    });
+
+    describe('update', () => {
+      it('should update a member', async () => {
+        const payload = {
+          name: 'Jane Doe',
+          profileImage: 'image.jpg',
+        };
+        jest.spyOn(prismaService.member, 'findFirst').mockResolvedValue(member);
+        jest.spyOn(prismaService.member, 'update').mockResolvedValue({ ...member });
+
+        const updatedMember = await service.update('1', payload);
+
+        expect(deleteFile).toHaveBeenCalledWith('image.jpg');
+        expect(prismaService.member.update).toHaveBeenCalledWith({
+          where: { id: '1' },
+          data: { ...member },
+        });
+        expect(updatedMember.name).toEqual('Jane Doe');
+      });
     });
   });
 });

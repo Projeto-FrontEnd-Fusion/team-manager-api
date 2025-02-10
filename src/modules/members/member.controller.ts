@@ -15,7 +15,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CreateMemberDto } from './dto/CreateMember.dto';
-import { Member } from 'src/entity/Member';
 import { MemberService } from './member.service';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
@@ -23,37 +22,51 @@ import { multerConfig } from '@configs/multer.config';
 @ApiTags('Members')
 @Controller('members')
 export class MemberController {
-  constructor(private memberService: MemberService) {}
+  constructor(private readonly memberService: MemberService) {}
 
-  @Post()
-  @UseInterceptors(FileInterceptor('file', multerConfig('member')))
-  @HttpCode(201)
-  @ApiConsumes('multipart/form-data')
+  @Post('')
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     storage: diskStorage({
+  //       destination: './statics/uploads/member',
+  //       filename: (req, file, cb) => {
+  //         const fileName =
+  //           path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
+  //         const extension = path.parse(file.originalname).ext;
+  //         cb(null, `${fileName}${extension}`);
+  //       },
+  //     }),
+  //   }),
+  // )
+  // @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: CreateMemberDto,
   })
-  async create(@UploadedFile() file: Express.Multer.File, @Body() data: CreateMemberDto) {
-    try {
-      data.profileImage = file.path;
-      return await this.memberService.create(data);
-    } catch (error) {
-      throw error;
-    }
+  async create(
+    @Body() data: CreateMemberDto,
+    // @UploadedFile(
+    //   new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
+    //     fileIsRequired: false,
+    //     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+    //   }),
+    // )
+    // file?: Express.Multer.File,
+  ) {
+    // if (file) {
+    //   data.profileImage = file.path;
+    // }
+    return await this.memberService.create(data);
   }
 
   @Get()
   @HttpCode(200)
-  async findAll(): Promise<Member[]> {
-    try {
-      return await this.memberService.findMany();
-    } catch (error) {
-      throw error;
-    }
+  async findAll() {
+    return await this.memberService.findMany();
   }
 
   @Get(':memberId')
   @HttpCode(200)
-  async findById(@Param('memberId') memberId: string): Promise<Member> {
+  async findById(@Param('memberId') memberId: string) {
     try {
       return await this.memberService.findById(memberId);
     } catch (error) {

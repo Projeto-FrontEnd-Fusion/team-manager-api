@@ -1,57 +1,84 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CreateMemberDto } from './dto/CreateMember.dto';
-import { Member } from '@entity/Member';
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { deleteFile } from '../shared/deleteFiles';
 
 @Injectable()
 export class MemberService {
-  constructor(
-    @InjectRepository(Member)
-    private readonly memberRepository: Repository<Member>,
-  ) {}
+  private readonly logger = new Logger(MemberService.name);
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async create(payload: CreateMemberDto): Promise<Member> {
+  async create(payload) {
     try {
-      const newMember = this.memberRepository.create({
-        ...payload,
-        id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        professionalProfile: payload.professionalProfile.map((profile) => ({
-          ...profile,
-          id: uuidv4(),
-          member: null,
+      const id = uuidv4();
+      const newMember = await this.prismaService.member.create({
+        data: {
+          id: id,
+          name: payload.name,
+          communityLevel: payload.communityLevel,
+          currentSquad: payload.currentSquad,
+          stack: payload.stack,
+          profileImage: payload.profileImage,
+          professionalProfiles: {
+            createMany: {
+              data: payload.professionalProfiles.map((profile) => ({
+                id: uuidv4(),
+                createdAt: new Date().toISOString(),
+                ...profile,
+              })),
+            },
+          },
+          projects: {
+            connect: payload.projects.map((id) => ({
+              id: id,
+            })),
+          },
+          SoftSkillsMembers: {
+            connect: payload.skills.map((id) => ({
+              id: id,
+            })),
+          },
+          SkillsMembers: {
+            connect: payload.softSkills.map((id) => ({
+              id: id,
+            })),
+          },
           createdAt: new Date().toISOString(),
-        })),
+        },
       });
+      this.logger.log(`Member (${payload.name}, id: ${id} created`);
 
-      return await this.memberRepository.save(newMember);
+      return newMember;
     } catch (error) {
-      throw error;
+      throw new Error(error);
     }
   }
 
-  async findById(id: string): Promise<Member> {
+  async findById(id: string) {
     try {
-      const member = await this.memberRepository.findOne({
+      const member = await this.prismaService.member.findFirst({
         where: { id: id },
+        include: {
+          professionalProfiles: true,
+          projects: true,
+          SkillsMembers: true,
+          SoftSkillsMembers: true,
+        },
       });
       if (!member) {
         throw new BadRequestException('Usuário não encontrado.');
       }
       return member;
     } catch (error) {
-      throw error;
+      throw new BadRequestException(error);
     }
   }
 
-  async findMany(): Promise<Member[]> {
+  async findMany() {
     try {
-      return await this.memberRepository.find();
+      return await this.prismaService.member.findMany();
     } catch (error) {
       throw new Error(
         'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
@@ -61,22 +88,20 @@ export class MemberService {
 
   async delete(id: string): Promise<void> {
     try {
-      const member = await this.findById(id);
+      const member = await this.prismaService.member.findFirst({
+        where: { id },
+        include: { projects: true },
+      });
+      await this.prismaService.member.delete({ where: { id: id } });
       await deleteFile(member.profileImage);
-      await Promise.all(
-        member.projects.map(async (p) => {
-          await deleteFile(p.projectCover);
-        }),
-      );
-      await this.memberRepository.delete({ id: id });
     } catch (error) {
-      console.error('Erro ao criar membro:', error);
+      console.error('Erro ao deletar membro:', error);
       throw error;
     }
   }
 
-  async update(id: string, payload: UpdateCreateMemberDto): Promise<Member> {
-    const memberExists = await this.memberRepository.findOne({
+  async update(id: string, payload: UpdateCreateMemberDto) {
+    const memberExists = await this.prismaService.member.findFirst({
       where: { id: id },
     });
 
@@ -98,19 +123,22 @@ export class MemberService {
       memberExists.currentSquad = payload.currentSquad;
     }
 
-    if (payload.skills && payload.skills.length > 0) {
-      memberExists.skills = payload.skills;
-    }
+    // if (payload.skills && payload.skills.length > 0) {
+    //   memberExists.skills = payload.skills;
+    // }
 
-    if (payload.softSkills && payload.softSkills.length > 0) {
-      memberExists.softSkills = payload.softSkills;
-    }
+    // if (payload.softSkills && payload.softSkills.length > 0) {
+    //   memberExists.softSkills = payload.softSkills;
+    // }
 
     if (payload.name && payload.name !== '') {
       memberExists.name = payload.name;
     }
 
-    await this.memberRepository.update({ id: id }, memberExists);
+    await this.prismaService.member.update({
+      where: { id: id },
+      data: memberExists,
+    });
     return memberExists;
   }
 }

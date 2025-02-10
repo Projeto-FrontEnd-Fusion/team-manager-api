@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
 
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberController } from './member.controller';
@@ -12,10 +13,7 @@ describe('MemberController', () => {
 
   const mockMemberService = {
     create: jest.fn(async (dto) => {
-      return {
-        id: Date.now().toString(),
-        ...dto,
-      };
+      return { id: Date.now().toString(), ...dto };
     }),
     findMany: jest.fn(async () => {
       return [
@@ -29,9 +27,9 @@ describe('MemberController', () => {
         },
       ];
     }),
-    findById: jest.fn(async (id) => {
+    findById: jest.fn(async () => {
       return {
-        id,
+        id: '1',
         name: 'John Doe',
         profileImage: 'path/to/image',
         professionalProfile: [
@@ -40,10 +38,7 @@ describe('MemberController', () => {
       };
     }),
     update: jest.fn(async (id, dto) => {
-      return {
-        id,
-        ...dto,
-      };
+      return { id, ...dto };
     }),
     delete: jest.fn(async () => {
       return;
@@ -69,81 +64,105 @@ describe('MemberController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create a member', async () => {
-    const dto: CreateMemberDto = {
-      name: 'John Doe',
-      profileImage: '',
-      stack: 'Full Stack',
-      communityLevel: 'Senior',
-      currentSquad: 'Eagles',
-      skills: ['Java', 'JavaScript'],
-      softSkills: ['Comunicativo', 'Atencioso', 'Prestativo'],
-      professionalProfile: [
-        {
-          id: uuidv4(),
-          platform: 'linkedin',
-          url: 'https://linkedin.com/seunome',
-          member: null, // O TypeORM associará o `member` automaticamente
-          createdAt: new Date().toISOString(),
-        },
-      ],
-    };
-    const file = { path: 'path/to/image' } as Express.Multer.File;
+  describe('create', () => {
+    it('should create a member', async () => {
+      const dto: CreateMemberDto = {
+        name: 'John Doe',
+        profileImage: '',
+        stack: 'Full Stack',
+        communityLevel: 'Senior',
+        currentSquad: 'Eagles',
+        skills: ['Java', 'JavaScript'],
+        softSkills: ['Comunicativo', 'Atencioso', 'Prestativo'],
+        professionalProfile: [
+          {
+            platform: 'linkedin',
+            url: 'https://linkedin.com/seunome',
+          },
+        ],
+      };
+      const file = { path: 'path/to/image' } as Express.Multer.File;
 
-    const result = await controller.create(file, dto);
+      const result = await controller.create(dto);
 
-    expect(result).toEqual({
-      id: expect.any(String),
-      ...dto,
-      profileImage: file.path,
-    });
-    expect(service.create).toHaveBeenCalledWith({
-      ...dto,
-      profileImage: file.path,
+      expect(result).toEqual({
+        id: expect.any(String),
+        ...dto,
+        profileImage: file.path,
+      });
+      expect(service.create).toHaveBeenCalledWith({
+        ...dto,
+        profileImage: file.path,
+      });
     });
   });
 
-  it('should return all members', async () => {
-    const result = await controller.findAll();
+  describe('findMany', () => {
+    it('should return all members', async () => {
+      const result = await controller.findAll();
 
-    expect(result).toEqual([
-      {
+      expect(result).toEqual([
+        {
+          id: '1',
+          name: 'John Doe',
+          profileImage: 'path/to/image',
+          professionalProfile: [
+            { platform: 'GitHub', url: 'https://github.com/johndoe' },
+          ],
+        },
+      ]);
+      expect(service.findMany).toHaveBeenCalled();
+    });
+  });
+
+  describe('findById', () => {
+    it('should return a member by id', async () => {
+      const result = await controller.findById('1');
+
+      expect(service.findById).toHaveBeenCalledWith('1');
+      expect(result).toEqual({
         id: '1',
         name: 'John Doe',
         profileImage: 'path/to/image',
-        professionalProfile: [{ platform: 'GitHub', url: 'https://github.com/johndoe' }],
-      },
-    ]);
-    expect(service.findMany).toHaveBeenCalled();
-  });
-
-  it('should return a member by id', async () => {
-    const result = await controller.findById('1');
-
-    expect(result).toEqual({
-      id: '1',
-      name: 'John Doe',
-      profileImage: 'path/to/image',
-      professionalProfile: [
-        { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe' },
-      ],
+        professionalProfile: [
+          { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe' },
+        ],
+      });
     });
-    expect(service.findById).toHaveBeenCalledWith('1');
+
+    it('should throw BadRequestException if error in findById', async () => {
+      jest
+        .spyOn(service, 'findById')
+        .mockRejectedValueOnce(
+          new BadRequestException(
+            'Ocorreu um erro ao buscar membro. Tente novamente mais tarde',
+          ),
+        );
+
+      await expect(controller.findById('2')).rejects.toThrow(BadRequestException);
+    });
   });
 
-  it('should update a member', async () => {
-    const dto: UpdateCreateMemberDto = { name: 'John Doe', profileImage: '' };
-    const file = { path: 'path/to/image' } as Express.Multer.File;
+  describe('update', () => {
+    it('should update a member', async () => {
+      const dto: UpdateCreateMemberDto = { name: 'John Doe', profileImage: '' };
+      const file = { path: 'path/to/image' } as Express.Multer.File;
 
-    const result = await controller.update('1', dto, file);
+      const result = await controller.update('1', dto, file);
 
-    expect(result).toEqual({ id: '1', ...dto, profileImage: file.path });
-    expect(service.update).toHaveBeenCalledWith('1', { ...dto, profileImage: file.path });
+      expect(result).toEqual({ id: '1', ...dto, profileImage: file.path });
+      expect(service.update).toHaveBeenCalledWith('1', {
+        ...dto,
+        profileImage: file.path,
+      });
+    });
   });
 
-  it('should delete a member', async () => {
-    await controller.delete('1');
+  describe('delete', () => {
+    it('should delete a member', async () => {
+      await controller.delete('1');
 
-    expect(service.delete).toHaveBeenCalledWith('1');
+      expect(service.delete).toHaveBeenCalledWith('1');
+    });
   });
 });
