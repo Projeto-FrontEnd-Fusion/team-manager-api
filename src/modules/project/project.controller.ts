@@ -1,4 +1,4 @@
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -23,18 +23,18 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('file', multerConfig('project')))
-  @HttpCode(HttpStatus.CREATED)
-  @ApiConsumes('multipart/form-data')
+  // @UseInterceptors(FileInterceptor('file', multerConfig('project')))
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: CreateProjectDto,
   })
   async createProject(
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
     @Body() data: CreateProjectDto,
   ) {
-    data.projectCover = file.path;
-    this.projectService.create(data);
+    // if (file.path) data.cover = file.path;
+    return await this.projectService.create(data);
   }
 
   @Get(':projectId')
@@ -54,26 +54,4 @@ export class ProjectController {
   async deleteProjectById(@Param('projetId') projectId: string) {
     return await this.projectService.deleteById(projectId);
   }
-
-  // @Patch(':memberId')
-  // @UseInterceptors(FileInterceptor('file', multerConfig('project')))
-  // @HttpCode(200)
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({
-  //   type: CreateProjectDto,
-  // })
-  // async addProject(
-  //   @UploadedFile() file: Express.Multer.File,
-  //   @Param('memberId') memberId: string,
-  //   @Body() data: CreateProjectDto,
-  // ) {
-  //   data.projectCover = file.path;
-  //   this.projectService.create(memberId, data);
-  // }
-
-  // @Delete(':id/member-id/:memberId')
-  // @HttpCode(204)
-  // async removeProject(@Param('id') id: string, @Param('memberId') memberId: string) {
-  //   this.projectService.removeProject(id, memberId);
-  // }
 }

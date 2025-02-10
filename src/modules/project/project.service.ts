@@ -1,45 +1,53 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CreateProjectDto } from './dto/CreateProject.dto';
-
-import { Project } from '@entity/Project';
+import { deleteFile } from '@modules/shared/deleteFiles';
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 
 @Injectable()
 export class ProjectService {
-  constructor(
-    @InjectRepository(Project)
-    private readonly projectRepository: Repository<Project>,
-  ) {}
+  private readonly logger = new Logger(ProjectService.name);
 
-  async create(projectData: CreateProjectDto) {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(projectData) {
     try {
-      const newProject = this.projectRepository.create({
-        id: uuidv4(),
-        projectName: projectData.projectName,
-        description: projectData.description,
-        projectUrl: projectData.projectUrl,
-        projectCover: projectData.projectCover,
-        technologies: projectData.technologies,
-        createdAt: new Date().toISOString(),
-        members: [],
+      const id = uuidv4();
+      const newProject = await this.prismaService.projects.create({
+        data: {
+          id: id,
+          createdAt: new Date().toISOString(),
+          cover: projectData.cover,
+          ...projectData,
+        },
       });
 
-      return await this.projectRepository.save(newProject);
+      this.logger.log(`Project (${projectData.projectName}, id: ${id}) created`);
+
+      return newProject;
     } catch (error) {
       throw new BadRequestException('Erro ao criar projeto');
     }
   }
 
-  async findMany(): Promise<Project[]> {
-    return await this.projectRepository.find({ relations: ['members'] });
+  async findMany() {
+    return await this.prismaService.projects.findMany({
+      include: {
+        members: true,
+      },
+    });
   }
 
-  async findById(projectId: string): Promise<Project> {
+  async findById(projectId: string) {
     try {
-      const project = await this.projectRepository.findOne({ where: { id: projectId } });
+      const project = await this.prismaService.projects.findFirst({
+        where: { id: projectId },
+      });
       if (!project) {
         throw new NotFoundException(`Projeto com id ${projectId} não encontrado`);
       }
@@ -51,17 +59,24 @@ export class ProjectService {
 
   // TODO: Create a way to delete images after delete a project
   async deleteById(projectId: string) {
-    const project = await this.projectRepository.findOne({
-      where: { id: projectId },
-    });
-    if (!project) {
-      throw new NotFoundException('Não foi possível encontrar o projeto.');
+    try {
+      const project = await this.prismaService.projects.findFirst({
+        where: { id: projectId },
+      });
+
+      if (!project) {
+        throw new NotFoundException('Não foi possível encontrar o projeto.');
+      }
+
+      await this.prismaService.projects.delete({ where: { id: projectId } });
+      await deleteFile(project.cover);
+    } catch (error) {
+      throw new Error(error);
     }
-    await this.projectRepository.delete({ id: projectId });
   }
 
-  async updateProject(projectId: string, payload: Partial<Project>) {
-    const project = await this.projectRepository.findOne({
+  async updateProject(projectId: string, payload) {
+    const project = await this.prismaService.projects.findFirst({
       where: { id: projectId },
     });
     if (!project) {
@@ -74,8 +89,11 @@ export class ProjectService {
       updatedAt: new Date().toISOString(),
     };
 
-    await this.projectRepository.update({ id: project.id }, updatedProject);
+    await this.prismaService.projects.update({
+      where: { id: project.id },
+      data: updatedProject,
+    });
 
-    return updatedProject as Project;
+    return updatedProject;
   }
 }
