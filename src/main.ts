@@ -10,7 +10,11 @@ import { corsOptions } from './configs/cors';
 import { useSwagger } from './configs/useSwagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: corsOptions });
+  const app = await NestFactory.create(AppModule, {
+    cors: corsOptions,
+    logger: ['error', 'warn', 'log'],
+  });
+  const config = app.get(ConfigService);
   appConfig(app);
 
   app.use(
