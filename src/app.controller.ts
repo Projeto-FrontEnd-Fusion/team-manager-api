@@ -14,7 +14,7 @@ export class AppController {
     summary: 'Summary exemplo',
     description: 'Rota exemplo',
   })
-  getHello(): string {
-    return 'acesse /api para verificar a documentação';
+  async getHello(): Promise<string> {
+    return this.appService.getHello();
   }
 }

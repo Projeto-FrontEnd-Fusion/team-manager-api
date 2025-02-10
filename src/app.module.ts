@@ -1,10 +1,11 @@
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
+
+import * as Joi from '@hapi/joi';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PostgresConfigService } from 'src/infra/typeorm/postgres.config.service';
 
 import { MemberModule } from '@modules/members/member.module';
 import { MemberProjectModule } from '@modules/member_project/member_project.module';
@@ -18,10 +19,30 @@ import { ProjectModule } from '@modules/project/project.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      useClass: PostgresConfigService,
-      inject: [PostgresConfigService],
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${new ConfigService().get<string>('NODE_ENV') || 'development'}`, // .env.development
+      validationSchema: Joi.object({
+        NODE_ENV: Joi.string().valid('development', 'production').default('development'),
+      }),
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1 * 1000,
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: 10 * 1000,
+        limit: 20,
+      },
+      {
+        name: 'long',
+        ttl: 60 * 1000,
+        limit: 100,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],
