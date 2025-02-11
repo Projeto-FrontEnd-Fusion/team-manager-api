@@ -5,45 +5,42 @@ import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
-import { v4 as uuidv4 } from 'uuid';
+
+const mockMemberService = {
+  create: jest.fn(async (dto) => {
+    return { id: Date.now().toString(), ...dto };
+  }),
+  findMany: jest.fn(async () => {
+    return [
+      {
+        id: '1',
+        name: 'John Doe',
+        profileImage: 'path/to/image',
+        professionalProfile: [{ platform: 'GitHub', url: 'https://github.com/johndoe' }],
+      },
+    ];
+  }),
+  findById: jest.fn(async () => {
+    return {
+      id: '1',
+      name: 'John Doe',
+      profileImage: 'path/to/image',
+      professionalProfile: [
+        { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe' },
+      ],
+    };
+  }),
+  update: jest.fn(async (id, dto) => {
+    return { id, ...dto };
+  }),
+  delete: jest.fn(async () => {
+    return;
+  }),
+};
 
 describe('MemberController', () => {
   let controller: MemberController;
   let service: MemberService;
-
-  const mockMemberService = {
-    create: jest.fn(async (dto) => {
-      return { id: Date.now().toString(), ...dto };
-    }),
-    findMany: jest.fn(async () => {
-      return [
-        {
-          id: '1',
-          name: 'John Doe',
-          profileImage: 'path/to/image',
-          professionalProfile: [
-            { platform: 'GitHub', url: 'https://github.com/johndoe' },
-          ],
-        },
-      ];
-    }),
-    findById: jest.fn(async () => {
-      return {
-        id: '1',
-        name: 'John Doe',
-        profileImage: 'path/to/image',
-        professionalProfile: [
-          { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe' },
-        ],
-      };
-    }),
-    update: jest.fn(async (id, dto) => {
-      return { id, ...dto };
-    }),
-    delete: jest.fn(async () => {
-      return;
-    }),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -81,18 +78,15 @@ describe('MemberController', () => {
           },
         ],
       };
-      const file = { path: 'path/to/image' } as Express.Multer.File;
 
       const result = await controller.create(dto);
 
       expect(result).toEqual({
         id: expect.any(String),
         ...dto,
-        profileImage: file.path,
       });
       expect(service.create).toHaveBeenCalledWith({
         ...dto,
-        profileImage: file.path,
       });
     });
   });
@@ -101,6 +95,7 @@ describe('MemberController', () => {
     it('should return all members', async () => {
       const result = await controller.findAll();
 
+      expect(service.findMany).toHaveBeenCalled();
       expect(result).toEqual([
         {
           id: '1',
@@ -111,7 +106,6 @@ describe('MemberController', () => {
           ],
         },
       ]);
-      expect(service.findMany).toHaveBeenCalled();
     });
   });
 

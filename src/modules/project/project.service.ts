@@ -8,39 +8,46 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { deleteFile } from '@modules/shared/deleteFiles';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
+import { CreateProjectDto } from './dto/CreateProject.dto';
 
 @Injectable()
 export class ProjectService {
   private readonly logger = new Logger(ProjectService.name);
-
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(projectData) {
+  async create(payload) {
     try {
       const id = uuidv4();
       const newProject = await this.prismaService.projects.create({
         data: {
           id: id,
           createdAt: new Date().toISOString(),
-          cover: projectData.cover,
-          ...projectData,
+          cover: payload.cover,
+          ...payload,
         },
       });
 
-      this.logger.log(`Project (${projectData.projectName}, id: ${id}) created`);
+      this.logger.log(`Project (${payload.name}, id: ${id}) created`);
 
       return newProject;
     } catch (error) {
+      if (error.code == 'P2002') {
+        throw new Error(`Unique constraint error, id already exists`);
+      }
       throw new BadRequestException('Erro ao criar projeto');
     }
   }
 
   async findMany() {
-    return await this.prismaService.projects.findMany({
-      include: {
-        members: true,
-      },
-    });
+    try {
+      return await this.prismaService.projects.findMany({
+        include: {
+          members: true,
+        },
+      });
+    } catch (error) {
+      throw new Error('Ocorreu um erro ao buscar projetos. Tente novamente mais tarde.');
+    }
   }
 
   async findById(projectId: string) {

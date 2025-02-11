@@ -24,7 +24,7 @@ import { multerConfig } from '@configs/multer.config';
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
-  @Post('')
+  @Post()
   // @UseInterceptors(
   //   FileInterceptor('file', {
   //     storage: diskStorage({
@@ -59,13 +59,13 @@ export class MemberController {
   }
 
   @Get()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async findAll() {
     return await this.memberService.findMany();
   }
 
   @Get(':memberId')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async findById(@Param('memberId') memberId: string) {
     try {
       return await this.memberService.findById(memberId);

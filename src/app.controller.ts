@@ -1,5 +1,5 @@
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Controller, Get, HttpCode } from '@nestjs/common';
+import { Controller, Get, HttpCode, Redirect } from '@nestjs/common';
 
 import { AppService } from './app.service';
 
@@ -15,6 +15,6 @@ export class AppController {
     description: 'Rota exemplo',
   })
   async getHello(): Promise<string> {
-    return this.appService.getHello();
+    return await this.appService.getHello();
   }
 }

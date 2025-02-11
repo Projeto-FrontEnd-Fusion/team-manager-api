@@ -7,15 +7,16 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
-  UploadedFile,
-  UseInterceptors,
+  // UploadedFile,
+  // UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+// import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CreateProjectDto } from './dto/CreateProject.dto';
 import { ProjectService } from './project.service';
-import { multerConfig } from '@configs/multer.config';
+// import { multerConfig } from '@configs/multer.config';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -26,12 +27,9 @@ export class ProjectController {
   // @UseInterceptors(FileInterceptor('file', multerConfig('project')))
   // @HttpCode(HttpStatus.CREATED)
   // @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: CreateProjectDto,
-  })
   async createProject(
     // @UploadedFile() file: Express.Multer.File,
-    @Body() data: CreateProjectDto,
+    @Body() data,
   ) {
     // if (file.path) data.cover = file.path;
     return await this.projectService.create(data);
@@ -53,5 +51,11 @@ export class ProjectController {
   @HttpCode(HttpStatus.OK)
   async deleteProjectById(@Param('projetId') projectId: string) {
     return await this.projectService.deleteById(projectId);
+  }
+
+  @Patch(':projectId')
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('projectId') projectId: string, @Body() payload) {
+    return await this.projectService.updateProject(projectId, payload);
   }
 }

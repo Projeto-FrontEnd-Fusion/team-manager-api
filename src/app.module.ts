@@ -21,10 +21,10 @@ import { ProjectModule } from '@modules/project/project.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${new ConfigService().get<string>('NODE_ENV') || 'development'}`, // .env.development
-      validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('development', 'production').default('development'),
-      }),
+      envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env',
+      // validationSchema: Joi.object({
+      //   NODE_ENV: Joi.string().valid('development', 'production').default('development'),
+      // }),
     }),
     ThrottlerModule.forRoot([
       {

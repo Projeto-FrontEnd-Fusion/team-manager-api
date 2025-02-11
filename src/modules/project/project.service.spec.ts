@@ -68,7 +68,7 @@ describe('ProjectService', () => {
         );
 
       await expect(projectService.findMany()).rejects.toThrow(
-        'Ocorreu um erro ao buscar os projetos. Tente novamente mais tarde',
+        'Ocorreu um erro ao buscar projetos. Tente novamente mais tarde.',
       );
     });
   });
