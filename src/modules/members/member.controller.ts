@@ -7,12 +7,16 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseFilePipeBuilder,
   Patch,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
 
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberService } from './member.service';
@@ -25,48 +29,47 @@ export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
   @Post()
-  // @UseInterceptors(
-  //   FileInterceptor('file', {
-  //     storage: diskStorage({
-  //       destination: './statics/uploads/member',
-  //       filename: (req, file, cb) => {
-  //         const fileName =
-  //           path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
-  //         const extension = path.parse(file.originalname).ext;
-  //         cb(null, `${fileName}${extension}`);
-  //       },
-  //     }),
-  //   }),
-  // )
-  // @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './statics/uploads/member',
+        filename: (req, file, cb) => {
+          const fileName =
+            path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
+          const extension = path.parse(file.originalname).ext;
+          cb(null, `${fileName}${extension}`);
+        },
+      }),
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: CreateMemberDto,
   })
-  async create(
+  async createMember(
     @Body() data: CreateMemberDto,
-    // @UploadedFile(
-    //   new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
-    //     fileIsRequired: false,
-    //     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-    //   }),
-    // )
-    // file?: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      }),
+    )
+    file?: Express.Multer.File,
   ) {
-    // if (file) {
-    //   data.profileImage = file.path;
-    // }
+    if (file) data.profileImage = file.path;
+
     return await this.memberService.create(data);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll() {
+  async findAllMembers() {
     return await this.memberService.findMany();
   }
 
   @Get(':memberId')
   @HttpCode(HttpStatus.OK)
-  async findById(@Param('memberId') memberId: string) {
+  async findMemberById(@Param('memberId') memberId: string) {
     try {
       return await this.memberService.findById(memberId);
     } catch (error) {
@@ -81,7 +84,7 @@ export class MemberController {
   @ApiBody({
     type: UpdateCreateMemberDto,
   })
-  async update(
+  async updateMember(
     @Param('id') id: string,
     @Body() payload: UpdateCreateMemberDto,
     @UploadedFile() file?: Express.Multer.File,
@@ -98,7 +101,7 @@ export class MemberController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id') id: string): Promise<void> {
+  async deleteMember(@Param('id') id: string): Promise<void> {
     try {
       await this.memberService.delete(id);
     } catch (error) {

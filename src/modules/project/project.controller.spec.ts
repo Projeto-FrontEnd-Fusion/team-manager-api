@@ -140,7 +140,7 @@ describe('ProjectController', () => {
       };
       jest.spyOn(service, 'updateProject').mockResolvedValue({ ...project, ...payload });
 
-      const response = await controller.update('1', payload);
+      const response = await controller.updateProject('1', payload);
 
       expect(response.name).toEqual('Frontend Fusion');
       expect(service.updateProject).toHaveBeenCalledWith('1', payload);

@@ -1,4 +1,4 @@
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -7,16 +7,18 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseFilePipeBuilder,
   Patch,
   Post,
-  // UploadedFile,
-  // UseInterceptors,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-// import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
 
-import { CreateProjectDto } from './dto/CreateProject.dto';
 import { ProjectService } from './project.service';
-// import { multerConfig } from '@configs/multer.config';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -24,14 +26,32 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  // @UseInterceptors(FileInterceptor('file', multerConfig('project')))
-  // @HttpCode(HttpStatus.CREATED)
-  // @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './statics/uploads/project',
+        filename: (req, file, cb) => {
+          const fileName =
+            path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
+          const extension = path.parse(file.originalname).ext;
+          cb(null, `${fileName}${extension}`);
+        },
+      }),
+    }),
+  )
+  @HttpCode(HttpStatus.CREATED)
+  @ApiConsumes('multipart/form-data')
   async createProject(
-    // @UploadedFile() file: Express.Multer.File,
     @Body() data,
+    @UploadedFile(
+      new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      }),
+    )
+    file?: Express.Multer.File,
   ) {
-    // if (file.path) data.cover = file.path;
+    if (file) data.cover = file.path;
     return await this.projectService.create(data);
   }
 
@@ -43,6 +63,7 @@ export class ProjectController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiResponse({})
   async findManyProjects() {
     return await this.projectService.findMany();
   }
@@ -55,7 +76,7 @@ export class ProjectController {
 
   @Patch(':projectId')
   @HttpCode(HttpStatus.OK)
-  async update(@Param('projectId') projectId: string, @Body() payload) {
+  async updateProject(@Param('projectId') projectId: string, @Body() payload) {
     return await this.projectService.updateProject(projectId, payload);
   }
 }

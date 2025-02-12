@@ -79,7 +79,7 @@ describe('MemberController', () => {
         ],
       };
 
-      const result = await controller.create(dto);
+      const result = await controller.createMember(dto);
 
       expect(result).toEqual({
         id: expect.any(String),
@@ -93,7 +93,7 @@ describe('MemberController', () => {
 
   describe('findMany', () => {
     it('should return all members', async () => {
-      const result = await controller.findAll();
+      const result = await controller.findAllMembers();
 
       expect(service.findMany).toHaveBeenCalled();
       expect(result).toEqual([
@@ -111,7 +111,7 @@ describe('MemberController', () => {
 
   describe('findById', () => {
     it('should return a member by id', async () => {
-      const result = await controller.findById('1');
+      const result = await controller.findMemberById('1');
 
       expect(service.findById).toHaveBeenCalledWith('1');
       expect(result).toEqual({
@@ -133,7 +133,7 @@ describe('MemberController', () => {
           ),
         );
 
-      await expect(controller.findById('2')).rejects.toThrow(BadRequestException);
+      await expect(controller.findMemberById('2')).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -142,7 +142,7 @@ describe('MemberController', () => {
       const dto: UpdateCreateMemberDto = { name: 'John Doe', profileImage: '' };
       const file = { path: 'path/to/image' } as Express.Multer.File;
 
-      const result = await controller.update('1', dto, file);
+      const result = await controller.updateMember('1', dto, file);
 
       expect(result).toEqual({ id: '1', ...dto, profileImage: file.path });
       expect(service.update).toHaveBeenCalledWith('1', {
@@ -154,7 +154,7 @@ describe('MemberController', () => {
 
   describe('delete', () => {
     it('should delete a member', async () => {
-      await controller.delete('1');
+      await controller.deleteMember('1');
 
       expect(service.delete).toHaveBeenCalledWith('1');
     });

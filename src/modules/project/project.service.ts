@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { deleteFile } from '@modules/shared/deleteFiles';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
-import { CreateProjectDto } from './dto/CreateProject.dto';
 
 @Injectable()
 export class ProjectService {
@@ -55,16 +54,17 @@ export class ProjectService {
       const project = await this.prismaService.projects.findFirst({
         where: { id: projectId },
       });
+
       if (!project) {
         throw new NotFoundException(`Projeto com id ${projectId} não encontrado`);
       }
+
       return project;
     } catch (error) {
       throw new NotFoundException();
     }
   }
 
-  // TODO: Create a way to delete images after delete a project
   async deleteById(projectId: string) {
     try {
       const project = await this.prismaService.projects.findFirst({
@@ -86,6 +86,7 @@ export class ProjectService {
     const project = await this.prismaService.projects.findFirst({
       where: { id: projectId },
     });
+
     if (!project) {
       return new NotFoundException();
     }

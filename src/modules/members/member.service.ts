@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
@@ -92,6 +97,11 @@ export class MemberService {
         where: { id },
         include: { projects: true },
       });
+
+      if (!member) {
+        throw new NotFoundException('Membro não encontrado.');
+      }
+
       await this.prismaService.member.delete({ where: { id: id } });
       await deleteFile(member.profileImage);
     } catch (error) {
@@ -104,6 +114,10 @@ export class MemberService {
     const memberExists = await this.prismaService.member.findFirst({
       where: { id: id },
     });
+
+    if (!memberExists) {
+      throw new NotFoundException('Membro não encontrado.');
+    }
 
     if (payload.profileImage && payload.profileImage !== memberExists.profileImage) {
       await deleteFile(memberExists.profileImage);
@@ -122,14 +136,6 @@ export class MemberService {
     if (payload.currentSquad && payload.currentSquad !== '') {
       memberExists.currentSquad = payload.currentSquad;
     }
-
-    // if (payload.skills && payload.skills.length > 0) {
-    //   memberExists.skills = payload.skills;
-    // }
-
-    // if (payload.softSkills && payload.softSkills.length > 0) {
-    //   memberExists.softSkills = payload.softSkills;
-    // }
 
     if (payload.name && payload.name !== '') {
       memberExists.name = payload.name;
