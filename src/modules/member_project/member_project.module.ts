@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Member } from '@entity/Member';
 import { MemberProjectController } from './member_project.controller';
 import { MemberProjectService } from './member_project.service';
-import { Project } from '@entity/Project';
+import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, Project])],
+  imports: [PrismaModule],
   controllers: [MemberProjectController],
   providers: [MemberProjectService],
   exports: [MemberProjectService],

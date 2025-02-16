@@ -71,7 +71,7 @@ export class ProjectController {
   @Delete(':projectId')
   @HttpCode(HttpStatus.OK)
   async deleteProjectById(@Param('projetId') projectId: string) {
-    return await this.projectService.deleteById(projectId);
+    return await this.projectService.delete(projectId);
   }
 
   @Patch(':projectId')

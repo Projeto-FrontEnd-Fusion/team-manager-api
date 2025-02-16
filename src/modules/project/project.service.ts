@@ -65,7 +65,7 @@ export class ProjectService {
     }
   }
 
-  async deleteById(projectId: string) {
+  async delete(projectId: string) {
     try {
       const project = await this.prismaService.projects.findFirst({
         where: { id: projectId },

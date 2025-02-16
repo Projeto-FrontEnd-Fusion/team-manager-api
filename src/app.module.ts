@@ -10,21 +10,22 @@ import { AppService } from './app.service';
 import { MemberModule } from '@modules/members/member.module';
 import { MemberProjectModule } from '@modules/member_project/member_project.module';
 import { ProjectModule } from '@modules/project/project.module';
+import { SkillModule } from '@modules/skills/skill.module';
+import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
 
 @Module({
   imports: [
     ProjectModule,
     MemberModule,
     MemberProjectModule,
+    SkillModule,
+    SoftSkillsModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env',
-      // validationSchema: Joi.object({
-      //   NODE_ENV: Joi.string().valid('development', 'production').default('development'),
-      // }),
     }),
     ThrottlerModule.forRoot([
       {

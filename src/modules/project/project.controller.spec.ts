@@ -116,11 +116,11 @@ describe('ProjectController', () => {
         url: '',
         createdAt: new Date().toISOString(),
       };
-      jest.spyOn(service, 'deleteById').mockResolvedValue(undefined);
+      jest.spyOn(service, 'delete').mockResolvedValue(undefined);
 
       await controller.deleteProjectById('1');
 
-      expect(service.deleteById).toHaveBeenCalledWith('1');
+      expect(service.delete).toHaveBeenCalledWith('1');
     });
   });
 

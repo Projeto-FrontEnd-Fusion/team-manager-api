@@ -153,7 +153,7 @@ describe('ProjectService', () => {
       jest.spyOn(prismaService.projects, 'delete').mockResolvedValue(undefined);
       (deleteFile as jest.Mock).mockResolvedValue(undefined);
 
-      await projectService.deleteById('1');
+      await projectService.delete('1');
 
       expect(deleteFile).toHaveBeenCalledWith('image.jpg');
       expect(prismaService.projects.delete).toHaveBeenCalledWith({ where: { id: '1' } });
@@ -162,7 +162,7 @@ describe('ProjectService', () => {
     it('should thrown NotFoundException if project not found', async () => {
       jest.spyOn(prismaService.projects, 'findFirst').mockResolvedValue(null);
 
-      await expect(projectService.deleteById('3')).rejects.toThrow(
+      await expect(projectService.delete('3')).rejects.toThrow(
         'Não foi possível encontrar o projeto.',
       );
     });

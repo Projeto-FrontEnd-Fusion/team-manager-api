@@ -40,12 +40,12 @@ export class MemberService {
               id: id,
             })),
           },
-          SoftSkillsMembers: {
+          SkillsMembers: {
             connect: payload.skills.map((id) => ({
               id: id,
             })),
           },
-          SkillsMembers: {
+          SoftSkillsMembers: {
             connect: payload.softSkills.map((id) => ({
               id: id,
             })),
