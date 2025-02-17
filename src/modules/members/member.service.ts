@@ -147,4 +147,15 @@ export class MemberService {
     });
     return memberExists;
   }
+
+  async deleteMemberFromProject(memberId: string, projectId: string) {
+    return await this.prismaService.projects.update({
+      where: { id: projectId },
+      data: {
+        members: {
+          disconnect: { id: memberId },
+        },
+      },
+    });
+  }
 }

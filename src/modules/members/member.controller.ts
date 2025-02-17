@@ -109,4 +109,13 @@ export class MemberController {
       throw error;
     }
   }
+
+  @Delete(':memberId/projects/:projectId')
+  @HttpCode(HttpStatus.OK)
+  async deleteMemberFromProject(
+    @Param('memberId') memberId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return await this.memberService.deleteMemberFromProject(memberId, projectId);
+  }
 }
