@@ -32,7 +32,7 @@ export class CreateProjectDto {
   @ApiProperty({
     description: 'Technologies used in the project',
     maxLength: 250,
-    example: 'Java, JavaScript, Python',
+    examples: ['Java', 'JavaScript', 'Python'],
   })
   @IsArray()
   technologies?: string;
