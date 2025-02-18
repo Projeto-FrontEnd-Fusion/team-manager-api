@@ -5,3 +5,5 @@ export type ProfessionalProfileEntity = {
   memberId: string;
   creadtAt: string;
 };
+
+export type HttpProfessionalProfileEntity = ProfessionalProfileEntity;

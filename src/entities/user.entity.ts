@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import { UserRolesEnum } from './user-roles.enum';
 
 export type UserEntity = {
@@ -9,4 +10,16 @@ export type UserEntity = {
   age: number;
   role: UserRolesEnum;
   createdAt: string;
+};
+
+export type PublicUserEntity = Omit<User, 'password'>;
+
+export type HttpPublicUserEntity = {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  age: number;
+  role: UserRolesEnum;
+  created_at: string;
 };
