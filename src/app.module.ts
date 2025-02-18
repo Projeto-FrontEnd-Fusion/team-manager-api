@@ -2,13 +2,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 
-import * as Joi from '@hapi/joi';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { MemberModule } from '@modules/members/member.module';
-import { MemberProjectModule } from '@modules/member_project/member_project.module';
 import { ProjectModule } from '@modules/project/project.module';
 import { SkillModule } from '@modules/skills/skill.module';
 import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
@@ -17,7 +14,6 @@ import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
   imports: [
     ProjectModule,
     MemberModule,
-    MemberProjectModule,
     SkillModule,
     SoftSkillsModule,
     ConfigModule.forRoot({
