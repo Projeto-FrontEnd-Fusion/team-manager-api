@@ -14,7 +14,7 @@ async function bootstrap() {
     cors: corsOptions,
     logger: ['error', 'warn', 'log'],
   });
-  const config = app.get(ConfigService);
+
   appConfig(app);
 
   app.use(
