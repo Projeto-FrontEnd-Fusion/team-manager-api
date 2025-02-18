@@ -10,3 +10,4 @@ temp/
 .env.dev
 .env.produce
 .env
+.env.test
