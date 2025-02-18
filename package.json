@@ -21,15 +21,13 @@
     "docker": "docker compose -f docker-compose.yaml up -d",
     "docker-prisma-migrate": "npm run docker && npm run prisma:migrate-dev-local",
     "docker:test": "docker compose -f docker-compose-test.yaml up -d && npx dotenv -e .env.test prisma db push",
-    "prisma:migrate-dev-local": "npx dotenv -e .env -- npx prisma migrate dev",
     "test:prisma": "npx dotenv -e .env.test prisma db push",
+    "prisma:migrate": "npx dotenv -e .env -- npx prisma migrate dev",
     "prisma:seed": "npx prisma db seed",
     "prisma:push": "npx prisma db push",
-    "prisma:generate": "npx prisma generate",
-    "prisma:migrate": "npx prisma migrate dev"
+    "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^10.0.0",
