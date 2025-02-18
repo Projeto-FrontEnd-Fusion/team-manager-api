@@ -15,7 +15,6 @@ export class SkillService {
         data: {
           id: uuidv4(),
           createdAt: new Date().toISOString(),
-          description: payload.description,
           name: payload.name,
         },
       });

@@ -19,7 +19,7 @@ export class SoftSkillController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createSoftSkill(@Body() payload) {
+  async createSoftSkill(@Body() payload: CreateSoftSkillDto) {
     return await this.softSkillService.create(payload);
   }
 

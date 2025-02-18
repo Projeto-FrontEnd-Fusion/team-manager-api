@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateSoftSkillDto } from './dto/CreateSoftSkill.dto';
 
 @Injectable()
 export class SoftSkillService {
@@ -13,14 +14,13 @@ export class SoftSkillService {
 
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(payload) {
+  async create(payload: CreateSoftSkillDto) {
     try {
       const id = uuidv4();
       const newSoftSkill = await this.prismaService.softSkills.create({
         data: {
           id: id,
           name: payload.name,
-          description: payload.description,
           createdAt: new Date().toISOString(),
         },
       });
@@ -81,7 +81,6 @@ export class SoftSkillService {
         where: { id: id },
         data: {
           name: payload.name || softSkill.name,
-          description: payload.description || softSkill.description,
         },
       });
     } catch (error) {
