@@ -1,5 +1,7 @@
 import { HttpMemberEntity, MemberEntity } from 'src/entities';
 import { HttpProjectMapper } from './http-project.mapper';
+import { HttpSkillsMapper } from './http-skills.mapper';
+import { HttpProfessionalProfileMapper } from './http-professional-profile.mapper';
 
 export class HttpMemberMapper {
   static toHttp(member: MemberEntity): HttpMemberEntity {
@@ -11,11 +13,17 @@ export class HttpMemberMapper {
       // current_squad: member.currentSquad,
       stack: member.stack,
       community_level: member.communityLevel,
-      professional_profile_url: member.professionalProfiles,
-      skills: member.skills,
-      projects: member.projects.map((p) => {
-        return HttpProjectMapper.toHttp(p);
-      }),
+      professional_profile: HttpProfessionalProfileMapper.ArrayToHttp(
+        member.professionalProfiles,
+      ),
+      skills: HttpSkillsMapper.ArrayToHttp(member.skills),
+      projects: HttpProjectMapper.ArrayToHttp(member.projects),
+      created_at: member.createdAt,
+      updated_at: member.updatedAt,
     };
+  }
+
+  static ArrayToHttp(members: MemberEntity[]): HttpMemberEntity[] {
+    return members.map((member) => this.toHttp(member));
   }
 }

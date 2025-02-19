@@ -22,6 +22,7 @@ import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberService } from './member.service';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
+import { HttpMemberMapper } from 'src/mappers/http-member.mapper';
 
 @ApiTags('Members')
 @Controller('members')
@@ -58,20 +59,22 @@ export class MemberController {
   ) {
     if (file) data.profileImage = file.path;
 
-    return await this.memberService.create(data);
+    return HttpMemberMapper.toHttp(await this.memberService.create(data));
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAllMembers() {
-    return await this.memberService.findMany();
+    const result = await this.memberService.findMany();
+    return HttpMemberMapper.ArrayToHttp(result);
   }
 
   @Get(':memberId')
   @HttpCode(HttpStatus.OK)
   async findMemberById(@Param('memberId') memberId: string) {
     try {
-      return await this.memberService.findById(memberId);
+      const result = await this.memberService.findById(memberId);
+      return HttpMemberMapper.toHttp(result);
     } catch (error) {
       throw error;
     }
