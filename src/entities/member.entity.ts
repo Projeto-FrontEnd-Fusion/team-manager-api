@@ -3,7 +3,7 @@ import {
   ProfessionalProfileEntity,
 } from './professional-profiles.entity';
 import { HttpProjectEntity, ProjectEntity } from './project.entity';
-import { SkillsEntity } from './skills.entity';
+import { HttpSkillEntity, SkillsEntity } from './skills.entity';
 import { SoftSkillsEntity } from './soft-skills.entity';
 
 export type MemberEntity = {
@@ -15,19 +15,21 @@ export type MemberEntity = {
   profileImage?: string;
   createdAt: string;
   updatedAt?: string;
-  skills: SkillsEntity[];
-  softSkills: SoftSkillsEntity[];
-  professionalProfiles: ProfessionalProfileEntity[];
-  projects: ProjectEntity[];
+  skills?: SkillsEntity[];
+  softSkills?: SoftSkillsEntity[];
+  professionalProfiles?: ProfessionalProfileEntity[];
+  projects?: ProjectEntity[];
 };
 
 export type HttpMemberEntity = {
   id: string;
   name: string;
-  profile_image: string;
+  profile_image?: string;
   stack: string;
   community_level: string;
-  professional_profile_url: HttpProfessionalProfileEntity[];
-  skills: SkillsEntity[];
+  created_at: string;
+  updated_at?: string;
+  professional_profile: HttpProfessionalProfileEntity[];
+  skills: HttpSkillEntity[];
   projects: HttpProjectEntity[];
 };

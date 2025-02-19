@@ -4,4 +4,8 @@ export type SoftSkillsEntity = {
   createdAt: string;
 };
 
-export type HttpSoftSkillEntity = SoftSkillsEntity;
+export type HttpSoftSkillsEntity = {
+  id: string;
+  name: string;
+  created_at: string;
+};

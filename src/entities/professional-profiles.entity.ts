@@ -3,7 +3,13 @@ export type ProfessionalProfileEntity = {
   platform: string;
   url: string;
   memberId: string;
-  creadtAt: string;
+  createdAt: string;
 };
 
-export type HttpProfessionalProfileEntity = ProfessionalProfileEntity;
+export type HttpProfessionalProfileEntity = {
+  id: string;
+  platform: string;
+  url: string;
+  member_id: string;
+  created_at: string;
+};

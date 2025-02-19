@@ -4,4 +4,8 @@ export type SkillsEntity = {
   createdAt: string;
 };
 
-export type HttpSkillEntity = SkillsEntity;
+export type HttpSkillEntity = {
+  id: string;
+  name: string;
+  created_at: string;
+};

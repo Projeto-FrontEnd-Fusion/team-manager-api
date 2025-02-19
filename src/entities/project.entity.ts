@@ -1,15 +1,19 @@
 import { MemberEntity } from './member.entity';
-import { HttpSkillEntity, SkillsEntity } from './skills.entity';
 
 export type ProjectEntity = {
   id: string;
   name: string;
   cover?: string;
   description: string;
-  technologies: SkillsEntity[];
+  technologies: string;
   url: string;
-  members: Partial<MemberEntity>[];
+  members?: Partial<MemberEntity>[];
   createdAt: string;
+};
+
+export type HttpMemberInProjectEntity = {
+  id: string;
+  name: string;
 };
 
 export type HttpProjectEntity = {
@@ -17,6 +21,7 @@ export type HttpProjectEntity = {
   project_cover: string;
   project_name: string;
   description: string;
-  technologies: HttpSkillEntity[];
+  technologies: string[];
+  members: Partial<HttpMemberInProjectEntity>[];
   projectUrl: string;
 };
