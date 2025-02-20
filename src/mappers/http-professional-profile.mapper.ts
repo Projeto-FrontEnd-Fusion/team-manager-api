@@ -9,7 +9,7 @@ export class HttpProfessionalProfileMapper {
       url: professionalProfile.url,
       platform: professionalProfile.platform,
       member_id: professionalProfile.memberId,
-      created_at: professionalProfile.creadtAt,
+      created_at: professionalProfile.createdAt,
     };
   }
 
