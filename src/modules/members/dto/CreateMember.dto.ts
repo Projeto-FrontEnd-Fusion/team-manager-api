@@ -1,0 +1,92 @@
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+
+class ProfessionalProfileDto {
+  @ApiProperty({ example: 'linkedin' })
+  @IsString()
+  platform: string;
+
+  @ApiProperty({ example: 'https://linkedin.com/seunome' })
+  @IsString()
+  url: string;
+}
+
+export class CreateMemberDto {
+  @ApiProperty({ description: 'Name of the member', example: 'John Doe' })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    description: 'Technology stack of the member',
+    example: 'Fullstack',
+  })
+  @IsNotEmpty()
+  @IsString()
+  stack: string;
+
+  @ApiProperty({
+    description: 'Community level of the member',
+    example: 'Senior',
+  })
+  @IsNotEmpty()
+  @IsString()
+  communityLevel: string;
+
+  @ApiProperty({
+    description: 'Current squad of the member',
+    example: 'Alpha Squad',
+  })
+  @IsNotEmpty()
+  @IsString()
+  currentSquad: string;
+
+  @ApiProperty({
+    type: [ProfessionalProfileDto],
+    description: 'Your professional profile with URL linkedin',
+    example: [{ platform: 'linkedin', url: 'https://linkedin.com/seunome' }],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProfessionalProfileDto)
+  professionalProfile: ProfessionalProfileDto[];
+
+  @ApiProperty({
+    description: 'Technical skills',
+    example: 'JavaScript, TypeScript, Java',
+  })
+  @IsNotEmpty()
+  @IsString()
+  skills: string[];
+
+  @ApiProperty({
+    description: 'Soft skills',
+    example: 'Communication, Teamwork',
+  })
+  @IsNotEmpty()
+  @IsString()
+  softSkills: string[];
+
+  @ApiProperty({
+    description: 'Imagem de perfil',
+    type: 'string',
+    format: 'binary',
+  })
+  @IsOptional()
+  file?: any;
+
+  @ApiProperty({
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
+}

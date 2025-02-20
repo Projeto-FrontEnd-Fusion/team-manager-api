@@ -1,25 +1,33 @@
+import 'reflect-metadata';
+import * as express from 'express';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
+
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { EnvConfig } from './config';
-import { corsOptions } from './config/cors';
-import { appConfig } from './config/app.config';
+import { appConfig } from './configs/app.config';
+import { corsOptions } from './configs/cors';
+import { useSwagger } from './configs/useSwagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: corsOptions });
-  appConfig(app)
+  const app = await NestFactory.create(AppModule, {
+    cors: corsOptions,
+    logger: ['error', 'warn', 'log'],
+  });
 
-  const config = new DocumentBuilder()
-    .setTitle('Back-end fusion')
-    .setDescription('Fusion do projeto colaborativo do fusion.')
-    .setVersion('1.0')
-    .addTag('fusion')
-    .addTag('member')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  appConfig(app);
 
-  await app.listen(EnvConfig.PORT);
-  console.log(`APP STARTED ON PORT: ${EnvConfig.PORT}`)
+  app.use(
+    '/statics/uploads',
+    express.static(join(__dirname, '..', 'statics', 'uploads')),
+  );
+
+  useSwagger(app);
+
+  const configService = app.get(ConfigService);
+
+  const PORT = configService.get<string>('PORT');
+  await app.listen(PORT);
+  console.log(`APP STARTED ON PORT: ${PORT}`);
 }
 bootstrap();

@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRoles {
+  ADMIM
+  USER
+}
+
+model User {
+  id        String    @id @unique(map: "user_id_uq")
+  email     String    @unique(map: "user_email_uq")
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  password  String
+  age       Int
+  role      UserRoles
+  createdAt String    @map("created_at")
+
+  @@map("user")
+}
+
+model Member {
+  id             String  @id @unique(map: "member_id_uq")
+  name           String
+  stack          String
+  communityLevel String  @map("community_level")
+  currentSquad   String? @map("current_squad")
+  profileImage   String?
+  createdAt      String
+
+  professionalProfiles ProfessionalProfile[]
+  projects             Projects[]
+  SkillsMembers        SkillsMembers[]
+  SoftSkillsMembers    SoftSkillsMembers[]
+
+  @@map("member")
+}
+
+model ProfessionalProfile {
+  id        String  @id @unique(map: "professional_profile_id_uq")
+  platform  String
+  url       String
+  member    Member? @relation(fields: [memberId], references: [id])
+  memberId  String? @map("member_id")
+  createdAt String  @map("created_at")
+
+  @@map("professional_profile")
+}
+
+model Projects {
+  id           String   @id @unique(map: "project_id_uq")
+  name         String
+  cover        String?
+  description  String
+  technologies String
+  url          String
+  members      Member[]
+  createdAt    String   @map("created_at")
+
+  @@map("projects")
+}
+
+model Skills {
+  id            String          @id @unique(map: "skills_id_uq")
+  name          String          @unique
+  createdAt     String          @map("created_at")
+  SkillsMembers SkillsMembers[]
+
+  @@map("skills")
+}
+
+model SoftSkills {
+  id                String              @id
+  name              String              @unique
+  createdAt         String              @map("created_at")
+  SoftSkillsMembers SoftSkillsMembers[]
+
+  @@map("soft_skills")
+}
+
+model SkillsMembers {
+  memberId String
+  skillId  String
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  skill  Skills @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, skillId])
+  @@map("skills_members")
+}
+
+model SoftSkillsMembers {
+  memberId    String
+  softSkillId String
+
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  softSkill SoftSkills @relation(fields: [softSkillId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, softSkillId])
+  @@map("soft_skills_members")
+}
+
+model Logs {
+  id        Int    @id @default(autoincrement())
+  message   String
+  createdAt String @map("created_at")
+
+  @@map("logs")
+}

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: team-manager-api-test
+    image: postgres:16-alpine
+    env_file:
+      - .env.test
+    volumes:
+      - ./data/pg:/data/test_db
+    ports:
+      - 5432:5432
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+volumes:
+  test_db:

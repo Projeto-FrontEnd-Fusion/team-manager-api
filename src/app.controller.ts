@@ -1,14 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, Redirect } from '@nestjs/common';
+
 import { AppService } from './app.service';
-import { ApiTags } from '@nestjs/swagger';
 
 @Controller()
-@ApiTags('Hello world')
+@ApiTags('Back-end Fusion')
 export class AppController {
-  constructor(private readonly appService: AppService) { }
+  constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return 'acesse /api para verificar a documentação';
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Summary exemplo',
+    description: 'Rota exemplo',
+  })
+  async getHello(): Promise<string> {
+    return await this.appService.getHello();
   }
 }
