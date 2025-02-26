@@ -16,7 +16,7 @@ const mockMemberService = {
         id: '1',
         name: 'John Doe',
         profileImage: 'path/to/image',
-        professionalProfile: [{ platform: 'GitHub', url: 'https://github.com/johndoe' }],
+        professionalProfiles: [{ platform: 'GitHub', url: 'https://github.com/johndoe' }],
       },
     ];
   }),
@@ -25,7 +25,7 @@ const mockMemberService = {
       id: '1',
       name: 'John Doe',
       profileImage: 'path/to/image',
-      professionalProfile: [
+      professionalProfiles: [
         { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe' },
       ],
     };
@@ -70,13 +70,13 @@ describe('MemberController', () => {
         communityLevel: 'Senior',
         currentSquad: 'Eagles',
         skills: ['Java', 'JavaScript'],
-        softSkills: ['Comunicativo', 'Atencioso', 'Prestativo'],
-        professionalProfile: [
+        professionalProfiles: [
           {
             platform: 'linkedin',
             url: 'https://linkedin.com/seunome',
           },
         ],
+        projects: [],
       };
 
       const result = await controller.createMember(dto);
@@ -101,7 +101,7 @@ describe('MemberController', () => {
           id: '1',
           name: 'John Doe',
           profileImage: 'path/to/image',
-          professionalProfile: [
+          professionalProfiles: [
             { platform: 'GitHub', url: 'https://github.com/johndoe' },
           ],
         },
@@ -118,7 +118,7 @@ describe('MemberController', () => {
         id: '1',
         name: 'John Doe',
         profileImage: 'path/to/image',
-        professionalProfile: [
+        professionalProfiles: [
           { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe' },
         ],
       });

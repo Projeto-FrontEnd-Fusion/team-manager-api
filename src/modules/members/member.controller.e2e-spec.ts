@@ -1,12 +1,12 @@
 import * as request from 'supertest';
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { Test } from '@nestjs/testing';
 
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
-import { PrismaClient } from '@prisma/client';
+
 import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 
 describe('MemberController (e2e)', () => {
@@ -37,13 +37,14 @@ describe('MemberController (e2e)', () => {
       communityLevel: 'Senior',
       currentSquad: 'Eagles',
       skills: ['Java', 'JavaScript'],
-      softSkills: ['Comunicativo', 'Atencioso', 'Prestativo'],
-      professionalProfile: [
+      softSkills: [],
+      professionalProfiles: [
         {
           platform: 'linkedin',
           url: 'https://linkedin.com/seunome',
         },
       ],
+      projects: [],
     };
 
     const response = await request(app.getHttpServer())
