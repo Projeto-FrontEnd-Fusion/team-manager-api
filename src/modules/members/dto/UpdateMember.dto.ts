@@ -34,7 +34,7 @@ export class UpdateCreateMemberDto {
   })
   @IsOptional()
   @IsString()
-  professionalProfile?: {
+  professionalProfiles?: {
     platform: string;
     url: string;
   };
