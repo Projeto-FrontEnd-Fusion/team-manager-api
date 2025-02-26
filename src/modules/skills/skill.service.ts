@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { SkillsEntity } from 'src/entities';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { CreateSkillDto } from './dto/CreateSkill.dto';
-import { SkillsEntity } from 'src/entities';
 
 @Injectable()
 export class SkillService {
@@ -14,8 +14,8 @@ export class SkillService {
       const newSkill = await this.prismaService.skills.create({
         data: {
           id: uuidv4(),
-          createdAt: new Date().toISOString(),
           name: payload.name,
+          createdAt: new Date().toISOString(),
         },
       });
 

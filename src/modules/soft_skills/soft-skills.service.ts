@@ -1,4 +1,3 @@
-import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import {
   BadRequestException,
   Injectable,
@@ -6,13 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+
 import { CreateSoftSkillDto } from './dto/CreateSoftSkill.dto';
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 
 @Injectable()
 export class SoftSkillService {
   private readonly logger = new Logger(SoftSkillService.name);
 
-  constructor(private readonly prismaService: PrismaService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private readonly prismaService: PrismaService) { }
 
   async create(payload: CreateSoftSkillDto) {
     try {
