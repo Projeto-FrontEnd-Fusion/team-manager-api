@@ -25,7 +25,9 @@
       "@configs/*": ["./src/configs/*"],
       "@test/*": ["./test/*"],
       "@utils/*": ["./src/utils/*"],
-      "@entity/*": ["./src/entity/*"]
+      "@entity/*": ["./src/entity/*"],
+      "@mappers/*": ["./src/mappers/*"],
+      "@interceptors/*": ["./src/interceptors/*"]
     }
   }
 }
