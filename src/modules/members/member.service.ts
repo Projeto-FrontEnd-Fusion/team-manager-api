@@ -79,7 +79,6 @@ export class MemberService {
           professionalProfiles: true,
           projects: true,
           SkillsMembers: true,
-          SoftSkillsMembers: true,
         },
       });
       if (!member) {
