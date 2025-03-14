@@ -14,12 +14,12 @@ export class DomainMemberMapper {
         createdAt: member.created_at,
         updatedAt: member.updated_at,
         professionalProfiles:
-          member.professional_profiles && member.professional_profiles.length > 0
+          (member.professional_profiles && member.professional_profiles.length > 0)
             ? DomainProfessionalProfileMapper.ArrayToDomain(member.professional_profiles)
             : [],
-        skills: (member.skills && member.skills) || [],
+        skills: member.skills ? member.skills : [],
         projects:
-          member.projects && member.projects.length > 0
+          (member.projects && member.projects.length > 0)
             ? DomainProjectMapper.ArrayToDomain(member.projects)
             : [],
       };
