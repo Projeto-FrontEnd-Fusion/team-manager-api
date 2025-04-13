@@ -12,7 +12,7 @@ import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 @Injectable()
 export class ProjectService {
   private readonly logger = new Logger(ProjectService.name);
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async create(payload) {
     try {
@@ -91,16 +91,14 @@ export class ProjectService {
       return new NotFoundException();
     }
 
-    const updatedProject = {
-      ...payload,
-      id: project.id,
-      updatedAt: new Date().toISOString(),
-    };
-
-    await this.prismaService.projects.update({
-      where: { id: project.id },
-      data: updatedProject,
-    });
+    const updatedProject = await this.prismaService.projects.update({
+      where: { id: projectId },
+      data: {
+        ...payload,
+        id: project.id,
+        updatedAt: new Date().toISOString(),
+      }
+    })
 
     return updatedProject;
   }

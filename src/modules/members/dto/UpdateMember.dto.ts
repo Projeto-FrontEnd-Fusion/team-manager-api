@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class UpdateCreateMemberDto {
   @ApiProperty({ description: 'Name of the member', required: false })
@@ -66,5 +66,9 @@ export class UpdateCreateMemberDto {
   @ApiHideProperty()
   @IsOptional()
   @IsString()
-  profileImage?: string;
+  profileImageUrl?: string;
+
+  @IsOptional()
+  @IsArray()
+  projectsIds: string[];
 }

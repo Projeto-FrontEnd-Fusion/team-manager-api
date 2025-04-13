@@ -13,7 +13,6 @@ export class MemberResponseTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
       map((data) => {
-        console.log(data);
         if (data instanceof Array && data.length > 0) {
           return HttpMemberMapper.ArrayToHttp(data);
         }

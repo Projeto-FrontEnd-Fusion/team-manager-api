@@ -52,7 +52,7 @@ export class MemberController {
     file?: Express.Multer.File,
   ) {
     if (file) data.profileImage = file.path;
-    return await this.memberService.create(data);
+    return await this.memberService.create(data, file);
   }
 
   @Get()
@@ -87,9 +87,9 @@ export class MemberController {
   ) {
     try {
       if (file) {
-        payload.profileImage = file.path;
+        payload.profileImageUrl = file.path;
       }
-      const result = await this.memberService.update(id, payload);
+      const result = await this.memberService.update(id, payload, file);
       return HttpMemberMapper.toHttp(result);
     } catch (error) {
       throw error;
