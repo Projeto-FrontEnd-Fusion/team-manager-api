@@ -1,5 +1,4 @@
 import { HttpProjectEntity, ProjectEntity } from 'src/entities';
-import { HttpSkillsMapper } from './http-skills.mapper';
 
 export class HttpProjectMapper {
   static toHttp(project: ProjectEntity): HttpProjectEntity {
@@ -16,6 +15,7 @@ export class HttpProjectMapper {
           name: member.name,
         };
       }),
+      created_at: project.createdAt,
     };
   }
 

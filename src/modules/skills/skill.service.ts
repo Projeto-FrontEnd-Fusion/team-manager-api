@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { SkillsEntity } from 'src/entities';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { CreateSkillDto } from './dto/CreateSkill.dto';
-import { SkillsEntity } from 'src/entities';
 
 @Injectable()
 export class SkillService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async create(payload: CreateSkillDto) {
     try {
       const newSkill = await this.prismaService.skills.create({
         data: {
           id: uuidv4(),
-          createdAt: new Date().toISOString(),
           name: payload.name,
+          createdAt: new Date().toISOString(),
         },
       });
 
@@ -42,7 +42,15 @@ export class SkillService {
   }
 
   async findMany() {
-    return await this.prismaService.skills.findMany();
+    const data = await this.prismaService.skills.findMany({
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+      }
+    });
+    console.log(data);
+    return data;
   }
 
   async delete(id: string) {

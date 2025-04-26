@@ -5,6 +5,7 @@ import { MemberService } from './member.service';
 import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 // import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { CreateMemberDto } from './dto/CreateMember.dto';
 import { deleteFile } from '@modules/shared/deleteFiles';
 
 jest.mock('@modules/shared/deleteFiles');
@@ -63,7 +64,16 @@ describe('MemberService', () => {
     });
 
     it('should throw an error if creation fails', async () => {
-      const payload = { name: 'John Doe' };
+      const payload: CreateMemberDto = {
+        name: 'John Doe',
+        communityLevel: 'Senior',
+        currentSquad: 'Eagles',
+        professionalProfiles: [],
+        projects: [],
+        skills: [],
+        softSkills: [],
+        stack: 'Full Stack',
+      };
       (prismaService.member.create as jest.Mock).mockRejectedValue(new Error('Error'));
 
       await expect(service.create(payload)).rejects.toThrow(Error);
@@ -142,7 +152,7 @@ describe('MemberService', () => {
         expect(deleteFile).toHaveBeenCalledWith('image.jpg');
         expect(prismaService.member.update).toHaveBeenCalledWith({
           where: { id: '1' },
-          data: { ...member },
+          data: { ...payload },
         });
         expect(updatedMember.name).toEqual('Jane Doe');
       });

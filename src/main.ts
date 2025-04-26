@@ -12,7 +12,7 @@ import { useSwagger } from './configs/useSwagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: corsOptions,
-    logger: ['error', 'warn', 'log'],
+    logger: ['error', 'warn', 'log', 'verbose'],
   });
 
   appConfig(app);

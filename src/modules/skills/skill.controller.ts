@@ -9,7 +9,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SkillService } from './skill.service';
 import { CreateSkillDto } from './dto/CreateSkill.dto';
 
@@ -22,14 +22,16 @@ export class SkillController {
   @ApiBody({
     type: CreateSkillDto,
   })
-  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   async createSkill(@Body() payload: CreateSkillDto) {
     return await this.skillService.create(payload);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async findSkillById(id: string) {
+  async findSkillById(@Param('id') id: string) {
     return await this.skillService.findById(id);
   }
 
@@ -39,7 +41,7 @@ export class SkillController {
     return await this.skillService.findMany();
   }
 
-  @Delete('id')
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deleteSkill(@Param('id') id: string) {
     return await this.skillService.delete(id);

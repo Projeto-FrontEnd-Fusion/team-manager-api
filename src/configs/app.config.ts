@@ -6,4 +6,6 @@ export function appConfig(app: INestApplication): void {
       whitelist: true,
     }),
   );
+
+  app.setGlobalPrefix('api/v1');
 }

@@ -14,34 +14,28 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
-import * as path from 'path';
 
+import {
+  MemberRequestTransformInterceptor,
+  MemberResponseTransformInterceptor,
+} from '@interceptors/index';
 import { CreateMemberDto } from './dto/CreateMember.dto';
+import { HttpMemberMapper } from '@mappers/HttpToDomain';
 import { MemberService } from './member.service';
 import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
-import { HttpMemberMapper } from 'src/mappers/http-member.mapper';
 
 @ApiTags('Members')
 @Controller('members')
+@UseInterceptors(MemberResponseTransformInterceptor)
 export class MemberController {
-  constructor(private readonly memberService: MemberService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private readonly memberService: MemberService) { }
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './statics/uploads/member',
-        filename: (req, file, cb) => {
-          const fileName =
-            path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
-          const extension = path.parse(file.originalname).ext;
-          cb(null, `${fileName}${extension}`);
-        },
-      }),
-    }),
+    FileInterceptor('file', multerConfig('member')),
+    MemberRequestTransformInterceptor,
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -58,8 +52,7 @@ export class MemberController {
     file?: Express.Multer.File,
   ) {
     if (file) data.profileImage = file.path;
-
-    return HttpMemberMapper.toHttp(await this.memberService.create(data));
+    return await this.memberService.create(data, file);
   }
 
   @Get()
@@ -69,11 +62,11 @@ export class MemberController {
     return HttpMemberMapper.ArrayToHttp(result);
   }
 
-  @Get(':memberId')
+  @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async findMemberById(@Param('memberId') memberId: string) {
+  async findMemberById(@Param('id') id: string) {
     try {
-      const result = await this.memberService.findById(memberId);
+      const result = await this.memberService.findById(id);
       return HttpMemberMapper.toHttp(result);
     } catch (error) {
       throw error;
@@ -94,9 +87,10 @@ export class MemberController {
   ) {
     try {
       if (file) {
-        payload.profileImage = file.path;
+        payload.profileImageUrl = file.path;
       }
-      return await this.memberService.update(id, payload);
+      const result = await this.memberService.update(id, payload, file);
+      return HttpMemberMapper.toHttp(result);
     } catch (error) {
       throw error;
     }
@@ -106,7 +100,7 @@ export class MemberController {
   @HttpCode(HttpStatus.OK)
   async deleteMember(@Param('id') id: string): Promise<void> {
     try {
-      await this.memberService.delete(id);
+      return await this.memberService.delete(id);
     } catch (error) {
       console.error('Erro ao criar membro:', error);
       throw error;

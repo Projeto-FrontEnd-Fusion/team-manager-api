@@ -145,3 +145,11 @@ Aqui está um exemplo completo de como todos os dados podem ser estruturadosem J
     "Communication", "Problem-solving", "Teamwork", "Adaptability", "Time management"
   ]
 } 
+```
+
+## Iniciando a API
+
+1. Instale as dependências do projeto, utilize o comando `npm install`;
+2. Crie um arquivo `.env`, copie as variáveis do `.env.example` para o `.env`;
+3. Inicialize o **Docker do PostgreSQL**, utilize o comando `npm run docker` e logo em seguida o comando `npm run prisma:migrate`;
+4. Dessa forma já temos nosso **Docker** funcionando, libs instaladas e **.env** configurada, roda o comando `npm run start:dev` para assim inicializar nossa **API**, agora a API já está funcionando.

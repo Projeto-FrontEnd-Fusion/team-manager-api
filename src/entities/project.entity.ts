@@ -1,4 +1,4 @@
-import { MemberEntity } from './member.entity';
+import { HttpMemberEntity, MemberEntity } from './member.entity';
 
 export type ProjectEntity = {
   id: string;
@@ -22,6 +22,7 @@ export type HttpProjectEntity = {
   project_name: string;
   description: string;
   technologies: string[];
-  members: Partial<HttpMemberInProjectEntity>[];
+  members: HttpMemberEntity[] | { id: string; name: string }[];
   projectUrl: string;
+  created_at: string;
 };

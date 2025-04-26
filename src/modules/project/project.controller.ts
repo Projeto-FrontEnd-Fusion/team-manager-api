@@ -14,35 +14,27 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
-import * as path from 'path';
 
+import { CreateProjectDto } from './dto/CreateProject.dto';
+import { ProjectRequestTransformInterceptor } from '@interceptors/index';
+import { ProjectResponseTransformInterceptor } from '@interceptors/index';
 import { ProjectService } from './project.service';
+import { multerConfig } from '@configs/multer.config';
 
 @ApiTags('Projects')
+@UseInterceptors(ProjectResponseTransformInterceptor)
 @Controller('projects')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private readonly projectService: ProjectService) { }
 
   @Post()
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './statics/uploads/project',
-        filename: (req, file, cb) => {
-          const fileName =
-            path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
-          const extension = path.parse(file.originalname).ext;
-          cb(null, `${fileName}${extension}`);
-        },
-      }),
-    }),
-  )
-  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FileInterceptor('file', multerConfig('project')))
+  @UseInterceptors(ProjectRequestTransformInterceptor)
   @ApiConsumes('multipart/form-data')
+  @HttpCode(HttpStatus.CREATED)
   async createProject(
-    @Body() data,
+    @Body() data: CreateProjectDto,
     @UploadedFile(
       new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
         fileIsRequired: false,
@@ -75,8 +67,9 @@ export class ProjectController {
   }
 
   @Patch(':projectId')
+  @UseInterceptors(FileInterceptor('file', multerConfig('project')))
   @HttpCode(HttpStatus.OK)
   async updateProject(@Param('projectId') projectId: string, @Body() payload) {
     return await this.projectService.updateProject(projectId, payload);
   }
-}
+};

@@ -26,13 +26,13 @@ model User {
 }
 
 model Member {
-  id             String  @id @unique(map: "member_id_uq")
-  name           String
-  stack          String
-  communityLevel String  @map("community_level")
-  currentSquad   String? @map("current_squad")
-  profileImage   String?
-  createdAt      String
+  id              String  @id @unique(map: "member_id_uq")
+  name            String
+  stack           String
+  communityLevel  String  @map("community_level")
+  currentSquad    String? @map("current_squad")
+  profileImageUrl String?
+  createdAt       String
 
   professionalProfiles ProfessionalProfile[]
   projects             Projects[]

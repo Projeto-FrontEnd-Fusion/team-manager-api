@@ -15,10 +15,10 @@ export type MemberEntity = {
   profileImage?: string;
   createdAt: string;
   updatedAt?: string;
-  skills?: SkillsEntity[];
-  softSkills?: SoftSkillsEntity[];
-  professionalProfiles?: ProfessionalProfileEntity[];
-  projects?: ProjectEntity[];
+  skills?: SkillsEntity[] | [];
+  softSkills?: SoftSkillsEntity[] | [];
+  professionalProfiles?: ProfessionalProfileEntity[] | [];
+  projects?: ProjectEntity[] | [];
 };
 
 export type HttpMemberEntity = {
@@ -29,7 +29,7 @@ export type HttpMemberEntity = {
   community_level: string;
   created_at: string;
   updated_at?: string;
-  professional_profile: HttpProfessionalProfileEntity[];
+  professional_profiles: HttpProfessionalProfileEntity[];
   skills: HttpSkillEntity[];
   projects: HttpProjectEntity[];
 };

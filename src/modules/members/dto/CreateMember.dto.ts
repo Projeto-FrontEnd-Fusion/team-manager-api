@@ -8,6 +8,8 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
+import { SoftSkillsEntity } from 'src/entities';
+
 class ProfessionalProfileDto {
   @ApiProperty({ example: 'linkedin' })
   @IsString()
@@ -36,7 +38,6 @@ export class CreateMemberDto {
     description: 'Community level of the member',
     example: 'Senior',
   })
-  @IsNotEmpty()
   @IsString()
   communityLevel: string;
 
@@ -44,7 +45,7 @@ export class CreateMemberDto {
     description: 'Current squad of the member',
     example: 'Alpha Squad',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   currentSquad: string;
 
@@ -56,23 +57,23 @@ export class CreateMemberDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProfessionalProfileDto)
-  professionalProfile: ProfessionalProfileDto[];
+  professionalProfiles: ProfessionalProfileDto[];
 
   @ApiProperty({
     description: 'Technical skills',
-    example: 'JavaScript, TypeScript, Java',
+    example: ['1', '2', '3'],
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsOptional()
+  @IsArray()
   skills: string[];
 
   @ApiProperty({
     description: 'Soft skills',
     example: 'Communication, Teamwork',
   })
-  @IsNotEmpty()
-  @IsString()
-  softSkills: string[];
+  @IsOptional()
+  @IsArray()
+  softSkills?: SoftSkillsEntity[];
 
   @ApiProperty({
     description: 'Imagem de perfil',
@@ -86,7 +87,11 @@ export class CreateMemberDto {
     type: String,
     required: false,
   })
-  @IsOptional()
+  // @IsOptional()
   @IsString()
   profileImage?: string;
+
+  @IsOptional()
+  @IsArray()
+  projects: string[];
 }
