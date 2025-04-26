@@ -1,5 +1,6 @@
-import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 import { Module } from '@nestjs/common';
+
+import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 import { SoftSkillController } from './soft-skills.controller';
 import { SoftSkillService } from './soft-skills.service';
 

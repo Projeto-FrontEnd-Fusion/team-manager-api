@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { ProjectController } from './project.controller';
 import { ProjectService } from './project.service';
-import { CreateProjectDto } from './dto/CreateProject.dto';
-import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
-import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 
 describe('ProjectController', () => {
   let controller: ProjectController;
@@ -138,7 +137,9 @@ describe('ProjectController', () => {
       const payload = {
         name: 'Frontend Fusion',
       };
-      jest.spyOn(service, 'updateProject').mockResolvedValue({ ...project, ...payload });
+      jest
+        .spyOn(service, 'updateProject')
+        .mockResolvedValue({ ...project, ...payload });
 
       const response = await controller.updateProject('1', payload);
 

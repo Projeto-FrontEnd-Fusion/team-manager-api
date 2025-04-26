@@ -36,7 +36,7 @@ model Member {
 
   professionalProfiles ProfessionalProfile[]
   projects             Projects[]
-  SkillsMembers        SkillsMembers[]
+  HardSkillsMembers    HardSkillsMembers[]
   SoftSkillsMembers    SoftSkillsMembers[]
 
   @@map("member")
@@ -58,7 +58,7 @@ model Projects {
   name         String
   cover        String?
   description  String
-  technologies String
+  technologies String[]
   url          String
   members      Member[]
   createdAt    String   @map("created_at")
@@ -66,11 +66,11 @@ model Projects {
   @@map("projects")
 }
 
-model Skills {
-  id            String          @id @unique(map: "skills_id_uq")
-  name          String          @unique
-  createdAt     String          @map("created_at")
-  SkillsMembers SkillsMembers[]
+model HardSkills {
+  id                String              @id @unique(map: "hard_skills_id_uq")
+  name              String              @unique
+  createdAt         String              @map("created_at")
+  HardSkillsMembers HardSkillsMembers[]
 
   @@map("skills")
 }
@@ -84,15 +84,15 @@ model SoftSkills {
   @@map("soft_skills")
 }
 
-model SkillsMembers {
-  memberId String
-  skillId  String
+model HardSkillsMembers {
+  memberId    String
+  hardSkillId String
 
-  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  skill  Skills @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  hardSkill HardSkills @relation(fields: [hardSkillId], references: [id], onDelete: Cascade)
 
-  @@id([memberId, skillId])
-  @@map("skills_members")
+  @@id([memberId, hardSkillId])
+  @@map("hard_skills_members")
 }
 
 model SoftSkillsMembers {

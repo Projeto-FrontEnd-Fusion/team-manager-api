@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { SkillsEntity } from 'src/entities';
+import { CreateHardSkillDto } from './dto/CreateHardSkill.dto';
+import { HardSkillsEntity } from 'src/entities';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
-import { CreateSkillDto } from './dto/CreateSkill.dto';
 
 @Injectable()
-export class SkillService {
-  constructor(private readonly prismaService: PrismaService) { }
+export class HardSkillService {
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async create(payload: CreateSkillDto) {
+  async create(payload: CreateHardSkillDto) {
     try {
-      const newSkill = await this.prismaService.skills.create({
+      const newHardSkill = await this.prismaService.hardSkills.create({
         data: {
           id: uuidv4(),
           name: payload.name,
@@ -19,7 +19,7 @@ export class SkillService {
         },
       });
 
-      return newSkill;
+      return newHardSkill;
     } catch (error) {
       throw new Error('Não foi possivel criar uma nova skill.');
     }
@@ -27,7 +27,7 @@ export class SkillService {
 
   async findById(id: string) {
     try {
-      const skill = this.prismaService.skills.findFirst({
+      const skill = this.prismaService.hardSkills.findFirst({
         where: { id: id },
       });
 
@@ -42,12 +42,12 @@ export class SkillService {
   }
 
   async findMany() {
-    const data = await this.prismaService.skills.findMany({
+    const data = await this.prismaService.hardSkills.findMany({
       select: {
         id: true,
         name: true,
         createdAt: true,
-      }
+      },
     });
     console.log(data);
     return data;
@@ -55,7 +55,7 @@ export class SkillService {
 
   async delete(id: string) {
     try {
-      const skill = this.prismaService.skills.delete({
+      const skill = this.prismaService.hardSkills.delete({
         where: { id: id },
       });
 
@@ -69,8 +69,8 @@ export class SkillService {
     }
   }
 
-  async update(id: string, payload: Partial<SkillsEntity>) {
-    const skill = await this.prismaService.skills.findFirst({
+  async update(id: string, payload: Partial<HardSkillsEntity>) {
+    const skill = await this.prismaService.hardSkills.findFirst({
       where: { id: id },
     });
 
@@ -78,7 +78,7 @@ export class SkillService {
       throw new NotFoundException('Skill não encontrada.');
     }
 
-    await this.prismaService.skills.update({
+    await this.prismaService.hardSkills.update({
       where: { id: id },
       data: {
         name: payload.name || skill.name,

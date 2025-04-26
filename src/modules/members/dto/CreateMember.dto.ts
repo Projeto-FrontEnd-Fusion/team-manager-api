@@ -8,7 +8,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-import { SoftSkillsEntity } from 'src/entities';
+import { SoftHardSkillsEntity } from 'src/entities';
 
 class ProfessionalProfileDto {
   @ApiProperty({ example: 'linkedin' })
@@ -60,12 +60,12 @@ export class CreateMemberDto {
   professionalProfiles: ProfessionalProfileDto[];
 
   @ApiProperty({
-    description: 'Technical skills',
+    description: 'Recive an array of Technical Hard Skills IDs',
     example: ['1', '2', '3'],
   })
   @IsOptional()
   @IsArray()
-  skills: string[];
+  hardSkills: string[];
 
   @ApiProperty({
     description: 'Soft skills',
@@ -73,7 +73,7 @@ export class CreateMemberDto {
   })
   @IsOptional()
   @IsArray()
-  softSkills?: SoftSkillsEntity[];
+  softSkills?: SoftHardSkillsEntity[];
 
   @ApiProperty({
     description: 'Imagem de perfil',

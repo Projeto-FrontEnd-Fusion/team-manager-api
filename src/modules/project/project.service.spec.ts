@@ -2,9 +2,9 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CreateProjectDto } from './dto/CreateProject.dto';
-import { ProjectService } from './project.service';
-import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
+import { ProjectService } from './project.service';
 import { deleteFile } from '@modules/shared/deleteFiles';
 
 jest.mock('@modules/shared/deleteFiles');
@@ -24,8 +24,12 @@ describe('ProjectService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
 
     jest.spyOn(prismaService.projects, 'create').mockImplementation(jest.fn());
-    jest.spyOn(prismaService.projects, 'findFirst').mockImplementation(jest.fn());
-    jest.spyOn(prismaService.projects, 'findMany').mockImplementation(jest.fn());
+    jest
+      .spyOn(prismaService.projects, 'findFirst')
+      .mockImplementation(jest.fn());
+    jest
+      .spyOn(prismaService.projects, 'findMany')
+      .mockImplementation(jest.fn());
     jest.spyOn(prismaService.projects, 'delete').mockImplementation(jest.fn());
     jest.spyOn(prismaService.projects, 'update').mockImplementation(jest.fn());
 
@@ -55,7 +59,9 @@ describe('ProjectService', () => {
         },
       ];
       createdAt: new Date().toISOString(),
-        jest.spyOn(prismaService.projects, 'findMany').mockResolvedValue(projects);
+        jest
+          .spyOn(prismaService.projects, 'findMany')
+          .mockResolvedValue(projects);
 
       expect(await projectService.findMany()).toEqual(projects);
     });
@@ -64,7 +70,9 @@ describe('ProjectService', () => {
       jest
         .spyOn(prismaService.projects, 'findMany')
         .mockRejectedValue(
-          new Error('Ocorreu um erro ao buscar os projetos. Tente novamente mais tarde'),
+          new Error(
+            'Ocorreu um erro ao buscar os projetos. Tente novamente mais tarde',
+          ),
         );
 
       await expect(projectService.findMany()).rejects.toThrow(
@@ -126,7 +134,9 @@ describe('ProjectService', () => {
         technologies: 'NodeJs',
         ...newProject,
       };
-      jest.spyOn(prismaService.projects, 'findFirst').mockResolvedValue(project);
+      jest
+        .spyOn(prismaService.projects, 'findFirst')
+        .mockResolvedValue(project);
 
       expect(await projectService.findById('1')).toEqual(project);
     });
@@ -134,7 +144,9 @@ describe('ProjectService', () => {
     it('should throw NotFoundException if project not found', async () => {
       jest.spyOn(prismaService.projects, 'findFirst').mockResolvedValue(null);
 
-      await expect(projectService.findById('1')).rejects.toThrow(NotFoundException);
+      await expect(projectService.findById('1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -149,14 +161,18 @@ describe('ProjectService', () => {
         url: '',
         createdAt: new Date().toISOString(),
       };
-      jest.spyOn(prismaService.projects, 'findFirst').mockResolvedValue(project);
+      jest
+        .spyOn(prismaService.projects, 'findFirst')
+        .mockResolvedValue(project);
       jest.spyOn(prismaService.projects, 'delete').mockResolvedValue(undefined);
       (deleteFile as jest.Mock).mockResolvedValue(undefined);
 
       await projectService.delete('1');
 
       expect(deleteFile).toHaveBeenCalledWith('image.jpg');
-      expect(prismaService.projects.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prismaService.projects.delete).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
 
     it('should thrown NotFoundException if project not found', async () => {
@@ -181,7 +197,9 @@ describe('ProjectService', () => {
         name: 'Frontend Fusion',
       };
 
-      jest.spyOn(prismaService.projects, 'findFirst').mockResolvedValue(project);
+      jest
+        .spyOn(prismaService.projects, 'findFirst')
+        .mockResolvedValue(project);
       jest.spyOn(prismaService.projects, 'update').mockResolvedValue(undefined);
 
       const updatedProject = await projectService.updateProject('1', payload);

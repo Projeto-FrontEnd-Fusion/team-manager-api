@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { deleteFile } from '@modules/shared/deleteFiles';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
+import { deleteFile } from '@modules/shared/deleteFiles';
 
 @Injectable()
 export class ProjectService {
   private readonly logger = new Logger(ProjectService.name);
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(payload) {
     try {
@@ -45,7 +45,9 @@ export class ProjectService {
         },
       });
     } catch (error) {
-      throw new Error('Ocorreu um erro ao buscar projetos. Tente novamente mais tarde.');
+      throw new Error(
+        'Ocorreu um erro ao buscar projetos. Tente novamente mais tarde.',
+      );
     }
   }
 
@@ -56,7 +58,9 @@ export class ProjectService {
       });
 
       if (!project) {
-        throw new NotFoundException(`Projeto com id ${projectId} não encontrado`);
+        throw new NotFoundException(
+          `Projeto com id ${projectId} não encontrado`,
+        );
       }
 
       return project;
@@ -97,8 +101,8 @@ export class ProjectService {
         ...payload,
         id: project.id,
         updatedAt: new Date().toISOString(),
-      }
-    })
+      },
+    });
 
     return updatedProject;
   }

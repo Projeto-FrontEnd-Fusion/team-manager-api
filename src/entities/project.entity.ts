@@ -5,7 +5,7 @@ export type ProjectEntity = {
   name: string;
   cover?: string;
   description: string;
-  technologies: string;
+  technologies: string[];
   url: string;
   members?: Partial<MemberEntity>[];
   createdAt: string;

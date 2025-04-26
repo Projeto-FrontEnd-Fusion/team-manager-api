@@ -28,6 +28,7 @@ export default [
         'error',
         {
           endOfLine: 'auto',
+          singleQuote: true,
         },
       ],
       'sort-imports': [

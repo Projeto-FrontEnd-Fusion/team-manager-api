@@ -8,7 +8,7 @@ export class HttpProjectMapper {
       project_name: project.name,
       description: project.description,
       projectUrl: project.url,
-      technologies: project.technologies.split(',').map((t) => t.trim()),
+      technologies: project.technologies,
       members: project.members.map((member) => {
         return {
           id: member.id,

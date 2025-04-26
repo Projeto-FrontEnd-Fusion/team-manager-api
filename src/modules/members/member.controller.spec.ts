@@ -16,7 +16,9 @@ const mockMemberService = {
         id: '1',
         name: 'John Doe',
         profileImage: 'path/to/image',
-        professionalProfiles: [{ platform: 'GitHub', url: 'https://github.com/johndoe' }],
+        professionalProfiles: [
+          { platform: 'GitHub', url: 'https://github.com/johndoe' },
+        ],
       },
     ];
   }),
@@ -133,7 +135,9 @@ describe('MemberController', () => {
           ),
         );
 
-      await expect(controller.findMemberById('2')).rejects.toThrow(BadRequestException);
+      await expect(controller.findMemberById('2')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 

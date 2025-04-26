@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 
 import { MemberModule } from '@modules/members/member.module';
 import { ProjectModule } from '@modules/project/project.module';
-import { SkillModule } from '@modules/skills/skill.module';
+import { SkillModule } from '@modules/hard_skills/hardSkill.module';
 import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
 
 @Module({
@@ -21,7 +21,9 @@ import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env',
+      envFilePath: process.env.NODE_ENV
+        ? `.env.${process.env.NODE_ENV}`
+        : '.env',
     }),
     ThrottlerModule.forRoot([
       {

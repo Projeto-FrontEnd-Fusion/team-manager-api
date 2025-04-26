@@ -5,11 +5,15 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
+
 import { DomainProjectMapper } from 'src/mappers/DomainToHttp/domain-project.mapper';
 
 @Injectable()
 export class ProjectRequestTransformInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler<any>,
+  ): Observable<any> {
     const request = context.switchToHttp().getRequest();
 
     if (request.body) {

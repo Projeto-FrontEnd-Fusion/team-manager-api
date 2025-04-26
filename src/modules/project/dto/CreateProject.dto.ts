@@ -1,4 +1,10 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProjectDto {

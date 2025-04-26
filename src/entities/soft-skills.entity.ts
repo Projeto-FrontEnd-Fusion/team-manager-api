@@ -1,10 +1,10 @@
-export type SoftSkillsEntity = {
+export type SoftHardSkillsEntity = {
   id: string;
   name: string;
   createdAt: string;
 };
 
-export type HttpSoftSkillsEntity = {
+export type HttpSoftHardSkillsEntity = {
   id: string;
   name: string;
   created_at: string;

@@ -36,7 +36,7 @@ describe('MemberService', () => {
       stack: 'Full Stack',
       communityLevel: 'Senior',
       currentSquad: 'Eagles',
-      skills: [],
+      hardSkills: [],
       softSkills: [],
       projects: [],
       professionalProfiles: [
@@ -70,11 +70,13 @@ describe('MemberService', () => {
         currentSquad: 'Eagles',
         professionalProfiles: [],
         projects: [],
-        skills: [],
+        hardSkills: [],
         softSkills: [],
         stack: 'Full Stack',
       };
-      (prismaService.member.create as jest.Mock).mockRejectedValue(new Error('Error'));
+      (prismaService.member.create as jest.Mock).mockRejectedValue(
+        new Error('Error'),
+      );
 
       await expect(service.create(payload)).rejects.toThrow(Error);
     });
@@ -93,7 +95,9 @@ describe('MemberService', () => {
       it('should throw BadRequestException if member not found', async () => {
         (prismaService.member.findFirst as jest.Mock).mockResolvedValue(null);
 
-        await expect(service.findById('1')).rejects.toThrow(BadRequestException);
+        await expect(service.findById('1')).rejects.toThrow(
+          BadRequestException,
+        );
       });
     });
 
@@ -134,7 +138,9 @@ describe('MemberService', () => {
         await service.delete('1');
 
         expect(deleteFile).toHaveBeenCalledWith('image.jpg');
-        expect(prismaService.member.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+        expect(prismaService.member.delete).toHaveBeenCalledWith({
+          where: { id: '1' },
+        });
       });
     });
 
@@ -145,7 +151,9 @@ describe('MemberService', () => {
           profileImage: 'image.jpg',
         };
         jest.spyOn(prismaService.member, 'findFirst').mockResolvedValue(member);
-        jest.spyOn(prismaService.member, 'update').mockResolvedValue({ ...member });
+        jest
+          .spyOn(prismaService.member, 'update')
+          .mockResolvedValue({ ...member });
 
         const updatedMember = await service.update('1', payload);
 

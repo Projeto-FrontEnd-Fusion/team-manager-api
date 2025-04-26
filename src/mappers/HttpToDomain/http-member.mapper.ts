@@ -1,7 +1,7 @@
 import { HttpMemberEntity, MemberEntity } from 'src/entities';
+import { HttpHardSkillsMapper } from './http-hard-skills.mapper';
 import { HttpProfessionalProfileMapper } from './http-professional-profile.mapper';
 import { HttpProjectMapper } from './http-project.mapper';
-import { HttpSkillsMapper } from './http-skills.mapper';
 
 export class HttpMemberMapper {
   static toHttp(member: MemberEntity): HttpMemberEntity {
@@ -18,8 +18,11 @@ export class HttpMemberMapper {
       professional_profiles:
         member.professionalProfiles &&
         HttpProfessionalProfileMapper.ArrayToHttp(member.professionalProfiles),
-      skills: member.skills && HttpSkillsMapper.ArrayToHttp(member.skills),
-      projects: member.projects && HttpProjectMapper.ArrayToHttp(member.projects),
+      hardSkills:
+        member.hardSkills &&
+        HttpHardSkillsMapper.ArrayToHttp(member.hardSkills),
+      projects:
+        member.projects && HttpProjectMapper.ArrayToHttp(member.projects),
     };
   }
 

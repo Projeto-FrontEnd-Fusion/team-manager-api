@@ -1,4 +1,8 @@
-import { HttpMemberEntity, HttpProjectEntity, ProjectEntity } from 'src/entities';
+import {
+  HttpMemberEntity,
+  HttpProjectEntity,
+  ProjectEntity,
+} from 'src/entities';
 import { DomainMemberMapper } from './domain-member.mapper';
 
 export class DomainProjectMapper {
@@ -9,7 +13,7 @@ export class DomainProjectMapper {
       name: project.project_name,
       description: project.description,
       url: project.projectUrl,
-      technologies: project.technologies.join(', '),
+      technologies: project.technologies,
       members:
         project.members &&
         project.members.length > 0 &&

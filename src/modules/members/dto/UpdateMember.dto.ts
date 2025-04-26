@@ -44,10 +44,10 @@ export class UpdateCreateMemberDto {
   @IsString()
   platform?: string[];
 
-  @ApiProperty({ description: 'Technical skills', required: false })
+  @ApiProperty({ description: 'Technical Hard Skills', required: false })
   @IsOptional()
   @IsString()
-  skills?: string[];
+  hardSkills?: string[];
 
   @ApiProperty({ description: 'Soft skills', required: false })
   @IsOptional()

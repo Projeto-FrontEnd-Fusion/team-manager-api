@@ -1,4 +1,7 @@
-import { HttpProfessionalProfileEntity, ProfessionalProfileEntity } from 'src/entities';
+import {
+  HttpProfessionalProfileEntity,
+  ProfessionalProfileEntity,
+} from 'src/entities';
 
 export class HttpProfessionalProfileMapper {
   static toHttp(

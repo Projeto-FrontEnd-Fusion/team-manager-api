@@ -72,4 +72,4 @@ export class ProjectController {
   async updateProject(@Param('projectId') projectId: string, @Body() payload) {
     return await this.projectService.updateProject(projectId, payload);
   }
-};
+}

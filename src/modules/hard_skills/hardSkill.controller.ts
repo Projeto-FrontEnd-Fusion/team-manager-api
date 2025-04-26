@@ -1,3 +1,4 @@
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -9,23 +10,23 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SkillService } from './skill.service';
-import { CreateSkillDto } from './dto/CreateSkill.dto';
+
+import { CreateHardSkillDto } from './dto/CreateHardSkill.dto';
+import { HardSkillService } from './hardSkill.service';
 
 @ApiTags('Skill')
 @Controller('skill')
 export class SkillController {
-  constructor(private readonly skillService: SkillService) {}
+  constructor(private readonly skillService: HardSkillService) {}
 
   @Post()
   @ApiBody({
-    type: CreateSkillDto,
+    type: CreateHardSkillDto,
   })
   @ApiResponse({
     status: HttpStatus.OK,
   })
-  async createSkill(@Body() payload: CreateSkillDto) {
+  async createHardSkill(@Body() payload: CreateHardSkillDto) {
     return await this.skillService.create(payload);
   }
 
@@ -49,7 +50,10 @@ export class SkillController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async updateSkill(@Param('id') id: string, @Body() payload: Partial<CreateSkillDto>) {
+  async updateSkill(
+    @Param('id') id: string,
+    @Body() payload: Partial<CreateHardSkillDto>,
+  ) {
     return await this.skillService.update(id, payload);
   }
 }

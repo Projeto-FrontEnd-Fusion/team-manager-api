@@ -10,6 +10,15 @@ Esta documentação descreve a estrutura de dados que representa as informaçõe
 
 ---
 
+## Inicializando a API
+
+1. Instale as dependências utilizando o comando `npm install`;
+2. Crie um arquivo `.env`, copie as variáveis do `.env.example` para o `.env`. Dessa forma já temos nosso **Docker** rodando, libs instaladas e **.env** configurada,;
+3. Inicialize o **Docker do PostgreSQL**, utilize o comando `npm run docker` e logo em seguida o comando `npm run prisma:migrate`;
+4. Utilize o comando `npm run start:dev` para assim inicializar nossa **API**, agora a API já está funcionando.
+
+---
+
 ## Propriedades
 
 ### 1. `name`
@@ -146,10 +155,3 @@ Aqui está um exemplo completo de como todos os dados podem ser estruturadosem J
   ]
 } 
 ```
-
-## Iniciando a API
-
-1. Instale as dependências do projeto, utilize o comando `npm install`;
-2. Crie um arquivo `.env`, copie as variáveis do `.env.example` para o `.env`;
-3. Inicialize o **Docker do PostgreSQL**, utilize o comando `npm run docker` e logo em seguida o comando `npm run prisma:migrate`;
-4. Dessa forma já temos nosso **Docker** funcionando, libs instaladas e **.env** configurada, roda o comando `npm run start:dev` para assim inicializar nossa **API**, agora a API já está funcionando.

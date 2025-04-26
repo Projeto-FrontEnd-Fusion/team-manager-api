@@ -1,7 +1,7 @@
-import { HttpSkillEntity, SkillsEntity } from 'src/entities';
+import { HardSkillsEntity, HttpHardSkillEntity } from 'src/entities';
 
 export class DomainSkillsMapper {
-  static toDomain(skill: HttpSkillEntity): SkillsEntity {
+  static toDomain(skill: HttpHardSkillEntity): HardSkillsEntity {
     return {
       id: skill.id,
       name: skill.name,
@@ -9,7 +9,7 @@ export class DomainSkillsMapper {
     };
   }
 
-  static ArrayToDomain(skills: HttpSkillEntity[]): SkillsEntity[] | [] {
+  static ArrayToDomain(skills: HttpHardSkillEntity[]): HardSkillsEntity[] | [] {
     if (skills.length === 0) return [];
 
     return skills.map((skill) => this.toDomain(skill));

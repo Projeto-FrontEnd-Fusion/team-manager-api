@@ -113,6 +113,9 @@ export class MemberController {
     @Param('memberId') memberId: string,
     @Param('projectId') projectId: string,
   ) {
-    return await this.memberService.deleteMemberFromProject(memberId, projectId);
+    return await this.memberService.deleteMemberFromProject(
+      memberId,
+      projectId,
+    );
   }
 }

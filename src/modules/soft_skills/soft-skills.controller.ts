@@ -9,8 +9,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { SoftSkillService } from './soft-skills.service';
 import { CreateSoftSkillDto } from './dto/CreateSoftSkill.dto';
+import { SoftSkillService } from './soft-skills.service';
 
 @ApiTags('Soft Skills')
 @Controller('soft-skills')
@@ -37,7 +37,10 @@ export class SoftSkillController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
-  async update(@Param('id') id: string, @Body() payload: Partial<CreateSoftSkillDto>) {
+  async update(
+    @Param('id') id: string,
+    @Body() payload: Partial<CreateSoftSkillDto>,
+  ) {
     return await this.softSkillService.update(id, payload);
   }
 }

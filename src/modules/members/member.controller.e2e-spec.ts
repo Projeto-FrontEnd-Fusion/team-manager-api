@@ -36,7 +36,7 @@ describe('MemberController (e2e)', () => {
       stack: 'Full Stack',
       communityLevel: 'Senior',
       currentSquad: 'Eagles',
-      skills: ['Java', 'JavaScript'],
+      hardSkills: ['Java', 'JavaScript'],
       softSkills: [],
       professionalProfiles: [
         {
@@ -56,7 +56,9 @@ describe('MemberController (e2e)', () => {
   });
 
   it('/members (GET)', async () => {
-    const response = await request(app.getHttpServer()).get('/members').expect(200);
+    const response = await request(app.getHttpServer())
+      .get('/members')
+      .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
   });
