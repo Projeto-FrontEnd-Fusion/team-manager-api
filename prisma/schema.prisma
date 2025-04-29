@@ -39,7 +39,7 @@ model Member {
   HardSkillsMembers    HardSkillsMembers[]
   SoftSkillsMembers    SoftSkillsMembers[]
 
-  @@map("member")
+  @@map("members")
 }
 
 model ProfessionalProfile {
@@ -72,7 +72,7 @@ model HardSkills {
   createdAt         String              @map("created_at")
   HardSkillsMembers HardSkillsMembers[]
 
-  @@map("skills")
+  @@map("hard_skills")
 }
 
 model SoftSkills {

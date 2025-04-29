@@ -13,7 +13,6 @@ import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 export class SoftSkillService {
   private readonly logger = new Logger(SoftSkillService.name);
 
-  // eslint-disable-next-line prettier/prettier
   constructor(private readonly prismaService: PrismaService) { }
 
   async create(payload: CreateSoftSkillDto) {

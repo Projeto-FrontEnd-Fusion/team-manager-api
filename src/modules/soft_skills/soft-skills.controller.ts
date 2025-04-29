@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -15,7 +16,7 @@ import { SoftSkillService } from './soft-skills.service';
 @ApiTags('Soft Skills')
 @Controller('soft-skills')
 export class SoftSkillController {
-  constructor(private readonly softSkillService: SoftSkillService) {}
+  constructor(private readonly softSkillService: SoftSkillService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -33,6 +34,12 @@ export class SoftSkillController {
   @HttpCode(HttpStatus.OK)
   async findSoftSkillById(@Param('id') id: string) {
     return await this.softSkillService.findById(id);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  async deleteSoftSkillById(@Param('id') id: string) {
+    return await this.softSkillService.delete(id);
   }
 
   @Put(':id')

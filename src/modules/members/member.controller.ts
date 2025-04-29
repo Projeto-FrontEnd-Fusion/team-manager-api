@@ -29,7 +29,6 @@ import { multerConfig } from '@configs/multer.config';
 @Controller('members')
 @UseInterceptors(MemberResponseTransformInterceptor)
 export class MemberController {
-  // eslint-disable-next-line prettier/prettier
   constructor(private readonly memberService: MemberService) { }
 
   @Post()

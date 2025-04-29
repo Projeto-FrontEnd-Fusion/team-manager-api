@@ -8,8 +8,6 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-import { SoftHardSkillsEntity } from 'src/entities';
-
 class ProfessionalProfileDto {
   @ApiProperty({ example: 'linkedin' })
   @IsString()
@@ -73,7 +71,7 @@ export class CreateMemberDto {
   })
   @IsOptional()
   @IsArray()
-  softSkills?: SoftHardSkillsEntity[];
+  softSkills: string[];
 
   @ApiProperty({
     description: 'Imagem de perfil',

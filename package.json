@@ -25,6 +25,7 @@
     "test:prisma": "npx dotenv -e .env.test prisma db push",
     "prisma:migrate": "npx dotenv -e .env -- npx prisma migrate dev",
     "prisma:seed": "npx prisma db seed",
+    "prisma:clean": "npx ts-node prisma/clean.ts",
     "prisma:push": "npx prisma db push",
     "prisma:generate": "npx prisma generate"
   },

@@ -15,7 +15,6 @@ import { deleteFile } from '../shared/deleteFiles';
 @Injectable()
 export class MemberService {
   private readonly logger = new Logger(MemberService.name);
-  // eslint-disable-next-line prettier/prettier
   constructor(private readonly prismaService: PrismaService) { }
 
   async create(payload: CreateMemberDto, file: Express.Multer.File) {
@@ -46,6 +45,13 @@ export class MemberService {
               },
             })),
           },
+          SoftSkillsMembers: {
+            create: payload.softSkills.map((softSkillId) => ({
+              softSkill: {
+                connect: { id: softSkillId }
+              }
+            }))
+          }
         },
         include: {
           professionalProfiles: true,
@@ -74,6 +80,7 @@ export class MemberService {
           professionalProfiles: true,
           projects: true,
           HardSkillsMembers: true,
+          SoftSkillsMembers: true,
         },
       });
       if (!member) {

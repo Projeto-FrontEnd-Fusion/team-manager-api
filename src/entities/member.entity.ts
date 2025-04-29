@@ -4,7 +4,7 @@ import {
   ProfessionalProfileEntity,
 } from './professional-profiles.entity';
 import { HttpProjectEntity, ProjectEntity } from './project.entity';
-import { SoftHardSkillsEntity } from './soft-skills.entity';
+import { HttpSoftSkillsEntity, SoftSkillsEntity } from './soft-skills.entity';
 
 export type MemberEntity = {
   id: string;
@@ -16,7 +16,7 @@ export type MemberEntity = {
   createdAt: string;
   updatedAt?: string;
   hardSkills?: HardSkillsEntity[] | [];
-  softSkills?: SoftHardSkillsEntity[] | [];
+  softSkills?: SoftSkillsEntity[] | [];
   professionalProfiles?: ProfessionalProfileEntity[] | [];
   projects?: ProjectEntity[] | [];
 };
@@ -31,5 +31,6 @@ export type HttpMemberEntity = {
   updated_at?: string;
   professional_profiles: HttpProfessionalProfileEntity[];
   hardSkills: HttpHardSkillEntity[];
+  softSkills: HttpSoftSkillsEntity[];
   projects: HttpProjectEntity[];
 };

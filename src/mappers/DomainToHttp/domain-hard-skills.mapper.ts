@@ -1,6 +1,6 @@
 import { HardSkillsEntity, HttpHardSkillEntity } from 'src/entities';
 
-export class DomainSkillsMapper {
+export class DomainHardSkillsMapper {
   static toDomain(skill: HttpHardSkillEntity): HardSkillsEntity {
     return {
       id: skill.id,

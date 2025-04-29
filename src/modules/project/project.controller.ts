@@ -25,7 +25,6 @@ import { multerConfig } from '@configs/multer.config';
 @UseInterceptors(ProjectResponseTransformInterceptor)
 @Controller('projects')
 export class ProjectController {
-  // eslint-disable-next-line prettier/prettier
   constructor(private readonly projectService: ProjectService) { }
 
   @Post()

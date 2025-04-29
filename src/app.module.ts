@@ -7,14 +7,14 @@ import { AppService } from './app.service';
 
 import { MemberModule } from '@modules/members/member.module';
 import { ProjectModule } from '@modules/project/project.module';
-import { SkillModule } from '@modules/hard_skills/hardSkill.module';
+import { HardSkillModule } from '@modules/hard_skills/hardSkill.module';
 import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
 
 @Module({
   imports: [
     ProjectModule,
     MemberModule,
-    SkillModule,
+    HardSkillModule,
     SoftSkillsModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -46,4 +46,4 @@ import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
