@@ -43,32 +43,92 @@ export class ProjectController {
     file?: Express.Multer.File,
   ) {
     if (file) data.cover = file.path;
-    return await this.projectService.create(data);
+    const result = await this.projectService.create(data);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Get(':projectId')
   @HttpCode(HttpStatus.OK)
   async findProjectById(@Param('projectId') projectId: string) {
-    return await this.projectService.findById(projectId);
+    const result = await this.projectService.findById(projectId);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiResponse({})
   async findManyProjects() {
-    return await this.projectService.findMany();
+    const result = await this.projectService.findMany();
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Delete(':projectId')
   @HttpCode(HttpStatus.OK)
   async deleteProjectById(@Param('projetId') projectId: string) {
-    return await this.projectService.delete(projectId);
+    const result = await this.projectService.delete(projectId);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Patch(':projectId')
   @UseInterceptors(FileInterceptor('file', multerConfig('project')))
   @HttpCode(HttpStatus.OK)
   async updateProject(@Param('projectId') projectId: string, @Body() payload) {
-    return await this.projectService.updateProject(projectId, payload);
+    const result = await this.projectService.updateProject(projectId, payload);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 }

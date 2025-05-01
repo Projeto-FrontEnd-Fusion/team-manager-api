@@ -10,4 +10,4 @@ import { SkillController } from './hardSkill.controller';
   providers: [HardSkillService],
   exports: [HardSkillService],
 })
-export class HardSkillModule { }
+export class HardSkillModule {}

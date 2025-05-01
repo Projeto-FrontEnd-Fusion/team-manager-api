@@ -9,9 +9,8 @@ export class HttpMemberMapper {
     return {
       id: member.id,
       name: member.name,
+      birth_date: member.birthDate,
       profile_image: member.profileImage,
-      // TODO: currentSquad não está sendo utilizado no frontend
-      // current_squad: member.currentSquad,
       stack: member.stack,
       community_level: member.communityLevel,
       created_at: member.createdAt,

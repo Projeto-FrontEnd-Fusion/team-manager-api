@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { CreateSoftSkillDto } from './dto/CreateSoftSkill.dto';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
+import { Either, left, right } from '@utils/either';
+import { SoftSkillsEntity } from 'src/entities';
 
 @Injectable()
 export class SoftSkillService {
@@ -15,7 +17,7 @@ export class SoftSkillService {
 
   constructor(private readonly prismaService: PrismaService) { }
 
-  async create(payload: CreateSoftSkillDto) {
+  async create(payload: CreateSoftSkillDto): Promise<Either<Error, SoftSkillsEntity>> {
     try {
       const id = uuidv4();
       const newSoftSkill = await this.prismaService.softSkills.create({
@@ -26,13 +28,13 @@ export class SoftSkillService {
         },
       });
 
-      return newSoftSkill;
+      return right(newSoftSkill);
     } catch (error) {
-      throw new Error(error);
+      return left(new Error(error));
     }
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<Either<NotFoundException | Error, SoftSkillsEntity>> {
     try {
       const softSkill = await this.prismaService.softSkills.findFirst({
         where: { id: id },
@@ -42,17 +44,22 @@ export class SoftSkillService {
         throw new NotFoundException('Soft Skill não encontrada.');
       }
 
-      return softSkill;
+      return right(softSkill);
     } catch (error) {
-      throw new BadRequestException(error);
+      return left(new BadRequestException(error));
     }
   }
 
-  async findMany() {
-    return await this.prismaService.softSkills.findMany();
+  async findMany(): Promise<Either<Error, SoftSkillsEntity[] | []>> {
+    try {
+      const result = await this.prismaService.softSkills.findMany();
+      return right(result)
+    } catch (err) {
+      return left(new Error('Bad request'))
+    }
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<Either<NotFoundException | Error, any>> {
     try {
       const softSkill = await this.prismaService.softSkills.findFirst({
         where: { id: id },
@@ -63,12 +70,14 @@ export class SoftSkillService {
       }
 
       await this.prismaService.softSkills.delete({ where: { id: id } });
+
+      return right();
     } catch (error) {
-      throw new BadRequestException(error);
+      return left(new BadRequestException(error));
     }
   }
 
-  async update(id: string, payload) {
+  async update(id: string, payload): Promise<Either<NotFoundException | Error, SoftSkillsEntity | any>> {
     try {
       const softSkill = await this.prismaService.softSkills.findFirst({
         where: { id: id },
@@ -84,8 +93,10 @@ export class SoftSkillService {
           name: payload.name || softSkill.name,
         },
       });
+
+      return right();
     } catch (error) {
-      throw new BadRequestException(error);
+      return left(new BadRequestException(error));
     }
   }
 }

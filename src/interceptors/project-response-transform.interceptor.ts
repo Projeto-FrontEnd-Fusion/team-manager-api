@@ -12,11 +12,23 @@ import { HttpProjectMapper } from 'src/mappers/HttpToDomain/http-project.mapper'
 export class ProjectResponseTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
-      map((data) => {
+      map(({ data, message, statusCode }) => {
         if (data instanceof Array && data.length > 0) {
-          return HttpProjectMapper.ArrayToHttp(data);
+          return {
+            data: HttpProjectMapper.ArrayToHttp(data),
+            message: message,
+            statusCode: statusCode,
+          };
         }
-        return HttpProjectMapper.toHttp(data);
+
+        return {
+          data:
+            statusCode > 199 && statusCode < 300
+              ? HttpProjectMapper.toHttp(data)
+              : data,
+          message: message,
+          statusCode: statusCode,
+        };
       }),
     );
   }

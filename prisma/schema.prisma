@@ -7,32 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRoles {
-  ADMIM
-  USER
-}
-
 model User {
-  id        String    @id @unique(map: "user_id_uq")
-  email     String    @unique(map: "user_email_uq")
-  firstName String    @map("first_name")
-  lastName  String    @map("last_name")
+  id        String  @id @unique(map: "user_id_uq")
+  email     String  @unique(map: "user_email_uq")
   password  String
-  age       Int
-  role      UserRoles
-  createdAt String    @map("created_at")
+  role      String
+  createdAt String  @map("created_at")
+  member    Member?
 
-  @@map("user")
+  @@map("users")
 }
 
 model Member {
   id              String  @id @unique(map: "member_id_uq")
-  name            String
   stack           String
+  name            String
+  birthDate       String
   communityLevel  String  @map("community_level")
   currentSquad    String? @map("current_squad")
   profileImageUrl String?
-  createdAt       String
+  createdAt       String  @map("created_at")
+  user            User    @relation(fields: [userId], references: [id])
+  userId          String  @unique
 
   professionalProfiles ProfessionalProfile[]
   projects             Projects[]
@@ -45,7 +41,7 @@ model Member {
 model ProfessionalProfile {
   id        String  @id @unique(map: "professional_profile_id_uq")
   platform  String
-  url       String
+  url       String  @unique(map: "professional_profile_url_uq")
   member    Member? @relation(fields: [memberId], references: [id])
   memberId  String? @map("member_id")
   createdAt String  @map("created_at")

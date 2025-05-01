@@ -22,7 +22,7 @@ export type HttpProjectEntity = {
   project_name: string;
   description: string;
   technologies: string[];
-  members: HttpMemberEntity[] | { id: string; name: string }[];
+  members: HttpMemberEntity[] | { id: string }[];
   projectUrl: string;
   created_at: string;
 };

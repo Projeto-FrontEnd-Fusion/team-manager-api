@@ -1,7 +1,7 @@
 export type HardSkillsEntity = {
-  id?: string;
-  name?: string;
-  createdAt?: string;
+  id: string;
+  name: string;
+  createdAt: string;
 };
 
 export type HttpHardSkillEntity = {

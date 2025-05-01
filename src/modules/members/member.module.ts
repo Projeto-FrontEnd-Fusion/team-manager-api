@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-// import { DatabaseModule } from '@infra/typeorm/postgres.module';
 import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
 import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
@@ -11,4 +10,4 @@ import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
   providers: [MemberService],
   exports: [MemberService],
 })
-export class MemberModule {}
+export class MemberModule { }

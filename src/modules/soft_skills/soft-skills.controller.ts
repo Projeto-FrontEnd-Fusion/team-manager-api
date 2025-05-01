@@ -21,25 +21,73 @@ export class SoftSkillController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createSoftSkill(@Body() payload: CreateSoftSkillDto) {
-    return await this.softSkillService.create(payload);
+    const result = await this.softSkillService.create(payload);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   async findManySoftSkills() {
-    return await this.softSkillService.findMany();
+    const result = await this.softSkillService.findMany();
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findSoftSkillById(@Param('id') id: string) {
-    return await this.softSkillService.findById(id);
+    const result = await this.softSkillService.findById(id);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deleteSoftSkillById(@Param('id') id: string) {
-    return await this.softSkillService.delete(id);
+    const result = await this.softSkillService.delete(id);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Put(':id')
@@ -48,6 +96,18 @@ export class SoftSkillController {
     @Param('id') id: string,
     @Body() payload: Partial<CreateSoftSkillDto>,
   ) {
-    return await this.softSkillService.update(id, payload);
+    const result = await this.softSkillService.update(id, payload);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 }

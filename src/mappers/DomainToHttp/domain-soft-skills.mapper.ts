@@ -9,7 +9,9 @@ export class DomainSoftSkillsMapper {
     };
   }
 
-  static ArrayToDomain(skills: HttpSoftSkillsEntity[]): SoftSkillsEntity[] | [] {
+  static ArrayToDomain(
+    skills: HttpSoftSkillsEntity[],
+  ): SoftSkillsEntity[] | [] {
     if (skills.length === 0) return [];
 
     return skills.map((skill) => this.toDomain(skill));

@@ -4,7 +4,7 @@ import { BadRequestException } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
-// import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+// import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { deleteFile } from '@modules/shared/deleteFiles';
 

@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -20,10 +21,10 @@ import {
   MemberResponseTransformInterceptor,
 } from '@interceptors/index';
 import { CreateMemberDto } from './dto/CreateMember.dto';
-import { HttpMemberMapper } from '@mappers/HttpToDomain';
 import { MemberService } from './member.service';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
+import { AuthGuard } from '@modules/auth/auth.guard';
 
 @ApiTags('Members')
 @Controller('members')
@@ -43,33 +44,68 @@ export class MemberController {
   async createMember(
     @Body() data: CreateMemberDto,
     @UploadedFile(
-      new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
+      new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 4000 }).build({
         fileIsRequired: false,
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       }),
     )
     file?: Express.Multer.File,
   ) {
+    console.log(file)
     if (file) data.profileImage = file.path;
-    return await this.memberService.create(data, file);
+    const result = await this.memberService.create(data, file);
+
+    if (result.isLeft())
+      return {
+        data: null,
+        message: result.value.message,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  async findAllMembers() {
+  async findManyMembers() {
     const result = await this.memberService.findMany();
-    return HttpMemberMapper.ArrayToHttp(result);
+
+    if (result.isLeft())
+      return {
+        data: null,
+        message: result.value.message,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findMemberById(@Param('id') id: string) {
-    try {
-      const result = await this.memberService.findById(id);
-      return HttpMemberMapper.toHttp(result);
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.memberService.findById(id);
+
+    if (result.isLeft())
+      return {
+        data: null,
+        message: result.value.message,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @Patch(':id')
@@ -77,33 +113,49 @@ export class MemberController {
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    type: UpdateCreateMemberDto,
+    type: UpdateMemberDto,
   })
   async updateMember(
     @Param('id') id: string,
-    @Body() payload: UpdateCreateMemberDto,
+    @Body() payload: UpdateMemberDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    try {
-      if (file) {
-        payload.profileImageUrl = file.path;
-      }
-      const result = await this.memberService.update(id, payload, file);
-      return HttpMemberMapper.toHttp(result);
-    } catch (error) {
-      throw error;
+    if (file) {
+      payload.profileImageUrl = file.path;
     }
+    const result = await this.memberService.update(id, payload, file);
+
+    if (result.isLeft())
+      return {
+        data: null,
+        message: result.value.message,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async deleteMember(@Param('id') id: string): Promise<void> {
-    try {
-      return await this.memberService.delete(id);
-    } catch (error) {
-      console.error('Erro ao criar membro:', error);
-      throw error;
-    }
+  async deleteMember(@Param('id') id: string) {
+    const result = await this.memberService.delete(id);
+
+    if (result.isLeft())
+      return {
+        data: null,
+        message: result.value.message,
+        statusCode: HttpStatus.OK,
+      };
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @Delete(':memberId/projects/:projectId')
@@ -112,9 +164,23 @@ export class MemberController {
     @Param('memberId') memberId: string,
     @Param('projectId') projectId: string,
   ) {
-    return await this.memberService.deleteMemberFromProject(
+    const result = await this.memberService.deleteMemberFromProject(
       memberId,
       projectId,
     );
+
+    if (result.isLeft()) {
+      return {
+        data: result.value,
+        message: null,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK,
+    };
   }
 }

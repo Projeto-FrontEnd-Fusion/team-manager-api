@@ -75,7 +75,7 @@ describe('MemberController (e2e)', () => {
 
   // it('/members/:id (PATCH)', async () => {
   //   const memberId = 'some-member-id'; // substitua por um ID válido
-  //   const updateMemberDto: UpdateCreateMemberDto = {
+  //   const updateMemberDto: UpdateMemberDto = {
   //     name: 'Jane Doe',
   //     // outros campos necessários
   //   };

@@ -4,7 +4,7 @@ import { BadRequestException } from '@nestjs/common';
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateMemberDto } from './dto/UpdateMember.dto';
 
 const mockMemberService = {
   create: jest.fn(async (dto) => {
@@ -71,7 +71,7 @@ describe('MemberController', () => {
         stack: 'Full Stack',
         communityLevel: 'Senior',
         currentSquad: 'Eagles',
-        skills: ['Java', 'JavaScript'],
+        hardSkills: ['1', '2'],
         professionalProfiles: [
           {
             platform: 'linkedin',
@@ -143,7 +143,10 @@ describe('MemberController', () => {
 
   describe('update', () => {
     it('should update a member', async () => {
-      const dto: UpdateCreateMemberDto = { name: 'John Doe', profileImage: '' };
+      const dto: UpdateMemberDto = {
+        name: 'John Doe',
+        profileImageUrl: '',
+      };
       const file = { path: 'path/to/image' } as Express.Multer.File;
 
       const result = await controller.updateMember('1', dto, file);

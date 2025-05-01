@@ -40,7 +40,6 @@ async function createHardSkills() {
     await prisma.hardSkills.createMany({
       data: notIncluded
     })
-    console.log(notIncluded);
   } catch (err) {
     console.log(err);
   }
@@ -109,7 +108,6 @@ async function createSoftSkills() {
     await prisma.softSkills.createMany({
       data: notIncluded
     })
-    console.log(notIncluded);
   } catch (err) {
     console.log(err);
   }

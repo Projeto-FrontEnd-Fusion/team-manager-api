@@ -8,13 +8,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { deleteFile } from '@modules/shared/deleteFiles';
+import { Either, left, right } from '@utils/either';
+import { ProjectEntity } from 'src/entities';
 
 @Injectable()
 export class ProjectService {
   private readonly logger = new Logger(ProjectService.name);
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
-  async create(payload) {
+  async create(payload): Promise<Either<Error, ProjectEntity>> {
     try {
       const id = uuidv4();
       const newProject = await this.prismaService.projects.create({
@@ -28,26 +30,28 @@ export class ProjectService {
 
       this.logger.log(`Project (${payload.name}, id: ${id}) created`);
 
-      return newProject;
+      return right(newProject);
     } catch (error) {
       if (error.code == 'P2002') {
-        throw new Error(`Unique constraint error, id already exists`);
+        return left(new Error(`Unique constraint error, id already exists`));
       }
-      throw new BadRequestException('Erro ao criar projeto');
+      return left(new BadRequestException('Erro ao criar projeto'));
     }
   }
 
   async findMany() {
     try {
-      return await this.prismaService.projects.findMany({
+      const result = await this.prismaService.projects.findMany({
         include: {
           members: true,
         },
       });
+
+      return right(result);
     } catch (error) {
-      throw new Error(
+      return left(new Error(
         'Ocorreu um erro ao buscar projetos. Tente novamente mais tarde.',
-      );
+      ));
     }
   }
 
@@ -63,9 +67,9 @@ export class ProjectService {
         );
       }
 
-      return project;
+      return right(project);
     } catch (error) {
-      throw new NotFoundException();
+      return left(new NotFoundException());
     }
   }
 
@@ -81,29 +85,35 @@ export class ProjectService {
 
       await this.prismaService.projects.delete({ where: { id: projectId } });
       await deleteFile(project.cover);
+
+      return right();
     } catch (error) {
-      throw new Error(error);
+      return left(new Error(error));
     }
   }
 
-  async updateProject(projectId: string, payload) {
-    const project = await this.prismaService.projects.findFirst({
-      where: { id: projectId },
-    });
+  async updateProject(projectId: string, payload): Promise<Either<Error, ProjectEntity>> {
+    try {
+      const project = await this.prismaService.projects.findFirst({
+        where: { id: projectId },
+      });
 
-    if (!project) {
-      return new NotFoundException();
+      if (!project) {
+        return left(new NotFoundException(`Can't found project.`));
+      }
+
+      const updatedProject = await this.prismaService.projects.update({
+        where: { id: projectId },
+        data: {
+          ...payload,
+          id: project.id,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+
+      return right(updatedProject);
+    } catch (err) {
+      return left(new BadRequestException(`Can't update project.`))
     }
-
-    const updatedProject = await this.prismaService.projects.update({
-      where: { id: projectId },
-      data: {
-        ...payload,
-        id: project.id,
-        updatedAt: new Date().toISOString(),
-      },
-    });
-
-    return updatedProject;
   }
 }

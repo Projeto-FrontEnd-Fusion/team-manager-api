@@ -19,10 +19,17 @@ class ProfessionalProfileDto {
 }
 
 export class CreateMemberDto {
-  @ApiProperty({ description: 'Name of the member', example: 'John Doe' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Member Name', example: 'Jhon Doe' })
   @IsString()
   name: string;
+
+  @ApiProperty({ description: 'User Id' })
+  @IsString()
+  userId: string;
+
+  @ApiProperty({ description: "Member's birth date", example: '10/10/2000' })
+  @IsString()
+  birhDate: string;
 
   @ApiProperty({
     description: 'Technology stack of the member',

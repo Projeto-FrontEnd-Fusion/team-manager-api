@@ -9,26 +9,33 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberEntity } from 'src/entities';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { deleteFile } from '../shared/deleteFiles';
+import { Either, left, right } from '@utils/either';
+import { EmailAlreadyRegisteredError } from 'src/errors/user/EmailAlreadyRegistered';
 
 @Injectable()
 export class MemberService {
   private readonly logger = new Logger(MemberService.name);
   constructor(private readonly prismaService: PrismaService) { }
 
-  async create(payload: CreateMemberDto, file: Express.Multer.File) {
+  async create(
+    payload: CreateMemberDto,
+    file: Express.Multer.File,
+  ): Promise<Either<EmailAlreadyRegisteredError | Error, MemberEntity>> {
     try {
       const id = uuidv4();
       const newMember = await this.prismaService.member.create({
         data: {
           id: id,
           name: payload.name,
+          birthDate: payload.birhDate,
           communityLevel: payload.communityLevel,
           currentSquad: payload.currentSquad,
           stack: payload.stack,
-          profileImageUrl: file.path,
+          profileImageUrl: payload.profileImage,
           createdAt: new Date().toISOString(),
+          userId: payload.userId,
           professionalProfiles: {
             createMany: {
               data: payload.professionalProfiles.map((profile) => ({
@@ -48,31 +55,49 @@ export class MemberService {
           SoftSkillsMembers: {
             create: payload.softSkills.map((softSkillId) => ({
               softSkill: {
-                connect: { id: softSkillId }
-              }
-            }))
-          }
+                connect: { id: softSkillId },
+              },
+            })),
+          },
         },
         include: {
           professionalProfiles: true,
           projects: true,
           HardSkillsMembers: {
+            select: {
+              hardSkill: {
+                select: {
+                  id: true,
+                  name: true,
+                  createdAt: true,
+                }
+              }
+            },
+          },
+          SoftSkillsMembers: {
             include: {
-              hardSkill: true,
+              softSkill: true,
             },
           },
         },
       });
 
-      this.logger.log(`Member (${payload.name}, id: ${id} created`);
+      this.logger.log(`Member (${payload}, id: ${id} created`);
 
-      return newMember;
-    } catch (error) {
-      throw new Error(error);
+      const memberEntity: MemberEntity = {
+        ...newMember,
+        hardSkills: newMember.HardSkillsMembers.map((hsm) => hsm.hardSkill),
+        softSkills: newMember.SoftSkillsMembers.map((ssm) => ssm.softSkill),
+      };
+
+      return right(memberEntity);
+    } catch (err) {
+      console.log(err)
+      return left(new Error(err));
     }
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<Either<Error, Partial<MemberEntity>>> {
     try {
       const member = await this.prismaService.member.findFirst({
         where: { id: id },
@@ -81,21 +106,24 @@ export class MemberService {
           projects: true,
           HardSkillsMembers: true,
           SoftSkillsMembers: true,
+          user: true,
         },
       });
+
       if (!member) {
-        throw new BadRequestException('Usuário não encontrado.');
+        return left(new BadRequestException('Usuário não encontrado.'));
       }
-      return member;
-    } catch (error) {
-      throw new BadRequestException(error);
+
+      return right(member);
+    } catch (err) {
+      return left(new BadRequestException(err))
     }
   }
 
-  async findMany() {
+  async findMany(): Promise<Either<Error, Partial<MemberEntity>[] | []>> {
     try {
-      const data = await this.prismaService.member.findMany({});
-      return data;
+      const data = await this.prismaService.member.findMany();
+      return right(data);
     } catch (error) {
       throw new Error(
         'Ocorreu um erro ao buscar os membros. Tente novamente mais tarde.',
@@ -103,7 +131,10 @@ export class MemberService {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  // TODO: Mudar o tipo de return
+  async delete(
+    id: string,
+  ): Promise<Either<Error, Partial<MemberEntity> | any>> {
     try {
       const member = await this.prismaService.member.findFirst({
         where: { id },
@@ -116,6 +147,8 @@ export class MemberService {
 
       await this.prismaService.member.delete({ where: { id: id } });
       await deleteFile(member.profileImageUrl);
+
+      return right();
     } catch (error) {
       console.error('Erro ao deletar membro:', error);
       throw error;
@@ -124,63 +157,94 @@ export class MemberService {
 
   async update(
     id: string,
-    payload: UpdateCreateMemberDto,
+    payload: UpdateMemberDto,
     file: Express.Multer.File,
-  ): Promise<MemberEntity> {
-    const memberExists = await this.prismaService.member.findFirst({
-      where: { id: id },
-      include: {
-        projects: true,
-      },
-    });
-
-    if (!memberExists) {
-      throw new NotFoundException('Membro não encontrado.');
-    }
-
-    if (file.path && file.path !== memberExists.profileImageUrl) {
-      await deleteFile(memberExists.profileImageUrl);
-    }
-
-    // Identifica os projetos que precisam ser desconectados
-    const currentProjectIds = memberExists.projects.map(
-      (project) => project.id,
-    );
-    const projectsToDisconnect = currentProjectIds.filter(
-      (projectId) => !payload.projectsIds.includes(projectId),
-    );
-
-    // Identifica os projetos que precisam ser conectados
-    const projectsToConnect = payload.projectsIds.filter(
-      (projectId) => !currentProjectIds.includes(projectId),
-    );
-
-    return await this.prismaService.member.update({
-      where: { id: id },
-      data: {
-        name: payload.name || memberExists.name,
-        communityLevel: payload.communityLevel || memberExists.communityLevel,
-        currentSquad: payload.currentSquad || memberExists.currentSquad,
-        stack: payload.stack || memberExists.stack,
-        profileImageUrl: file.path || memberExists.profileImageUrl,
-        projects: {
-          disconnect: projectsToDisconnect.map((projectId) => ({
-            id: projectId,
-          })), // Desconecta os projetos
-          connect: projectsToConnect.map((projectId) => ({ id: projectId })), // Conecta os novos projetos
+  ): Promise<Either<Error, Partial<MemberEntity>>> {
+    try {
+      const memberExists = await this.prismaService.member.findFirst({
+        where: { id: id },
+        include: {
+          projects: true,
         },
-      },
-    });
+      });
+
+      if (!memberExists) {
+        throw new NotFoundException('Membro não encontrado.');
+      }
+
+      if (file.path && file.path !== memberExists.profileImageUrl) {
+        await deleteFile(memberExists.profileImageUrl);
+      }
+
+      // Identifica os projetos que precisam ser desconectados
+      const currentProjectIds = memberExists.projects.map(
+        (project) => project.id,
+      );
+      const projectsToDisconnect = currentProjectIds.filter(
+        (projectId) => !payload.projectsIds.includes(projectId),
+      );
+
+      // Identifica os projetos que precisam ser conectados
+      const projectsToConnect = payload.projectsIds.filter(
+        (projectId) => !currentProjectIds.includes(projectId),
+      );
+
+      const updatedMember = await this.prismaService.member.update({
+        where: { id: id },
+        data: {
+          communityLevel: payload.communityLevel || memberExists.communityLevel,
+          currentSquad: payload.currentSquad || memberExists.currentSquad,
+          stack: payload.stack || memberExists.stack,
+          profileImageUrl: file.path || memberExists.profileImageUrl,
+          projects: {
+            disconnect: projectsToDisconnect.map((projectId) => ({
+              id: projectId,
+            })), // Desconecta os projetos
+            connect: projectsToConnect.map((projectId) => ({ id: projectId })), // Conecta os novos projetos
+          },
+        },
+        include: {
+          HardSkillsMembers: {
+            include: {
+              hardSkill: true,
+            },
+          },
+          SoftSkillsMembers: {
+            include: {
+              softSkill: true,
+            },
+          },
+        },
+      });
+
+      return right({
+        ...updatedMember,
+        hardSkills: updatedMember.HardSkillsMembers.map((hsm) => hsm.hardSkill),
+        softSkills: updatedMember.SoftSkillsMembers.map((ssm) => ssm.softSkill),
+      });
+    } catch (err) {
+      return left(new Error('Bad request'));
+    }
   }
 
-  async deleteMemberFromProject(memberId: string, projectId: string) {
-    return await this.prismaService.projects.update({
-      where: { id: projectId },
-      data: {
-        members: {
-          disconnect: { id: memberId },
+  async deleteMemberFromProject(
+    memberId: string,
+    projectId: string,
+  ): Promise<Either<Error, Partial<MemberEntity>>> {
+    try {
+      const result = await this.prismaService.projects.update({
+        where: { id: projectId },
+        data: {
+          members: {
+            disconnect: { id: memberId },
+          },
         },
-      },
-    });
+      });
+
+      return right(result);
+    } catch (err) {
+      console.error(err);
+      return left(new Error(err));
+    }
   }
 }

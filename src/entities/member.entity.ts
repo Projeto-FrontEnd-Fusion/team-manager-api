@@ -8,15 +8,16 @@ import { HttpSoftSkillsEntity, SoftSkillsEntity } from './soft-skills.entity';
 
 export type MemberEntity = {
   id: string;
-  name: string;
   stack: string;
+  name: string;
+  birthDate: string;
   communityLevel: string;
   currentSquad?: string;
   profileImage?: string;
   createdAt: string;
   updatedAt?: string;
-  hardSkills?: HardSkillsEntity[] | [];
-  softSkills?: SoftSkillsEntity[] | [];
+  hardSkills: HardSkillsEntity[] | [];
+  softSkills: SoftSkillsEntity[] | [];
   professionalProfiles?: ProfessionalProfileEntity[] | [];
   projects?: ProjectEntity[] | [];
 };
@@ -24,6 +25,7 @@ export type MemberEntity = {
 export type HttpMemberEntity = {
   id: string;
   name: string;
+  birth_date: string;
   profile_image?: string;
   stack: string;
   community_level: string;

@@ -9,9 +9,13 @@ import { MemberModule } from '@modules/members/member.module';
 import { ProjectModule } from '@modules/project/project.module';
 import { HardSkillModule } from '@modules/hard_skills/hardSkill.module';
 import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
+import { UserModule } from '@modules/users/user.module';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
+    UserModule,
+    AuthModule,
     ProjectModule,
     MemberModule,
     HardSkillModule,

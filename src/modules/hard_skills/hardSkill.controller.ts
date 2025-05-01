@@ -27,25 +27,73 @@ export class SkillController {
     status: HttpStatus.OK,
   })
   async createHardSkill(@Body() payload: CreateHardSkillDto) {
-    return await this.hardSkillService.create(payload);
+    const result = await this.hardSkillService.create(payload);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findSkillById(@Param('id') id: string) {
-    return await this.hardSkillService.findById(id);
+    const result = await this.hardSkillService.findById(id);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   async findManySkills() {
-    return await this.hardSkillService.findMany();
+    const result = await this.hardSkillService.findMany();
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deleteSkill(@Param('id') id: string) {
-    return await this.hardSkillService.delete(id);
+    const result = await this.hardSkillService.delete(id);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 
   @Patch(':id')
@@ -54,6 +102,18 @@ export class SkillController {
     @Param('id') id: string,
     @Body() payload: Partial<CreateHardSkillDto>,
   ) {
-    return await this.hardSkillService.update(id, payload);
+    const result = await this.hardSkillService.update(id, payload);
+
+    if (result.isLeft()) return {
+      data: null,
+      message: result.value.message,
+      statusCode: HttpStatus.BAD_REQUEST
+    }
+
+    return {
+      data: result.value,
+      message: null,
+      statusCode: HttpStatus.OK
+    }
   }
 }
