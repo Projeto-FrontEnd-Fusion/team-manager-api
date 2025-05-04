@@ -1,8 +1,9 @@
 import {
-  CanActivate, ExecutionContext, Injectable, UnauthorizedException,
+  CanActivate, ExecutionContext, Injectable,
   ForbiddenException,
   Logger,
 } from '@nestjs/common';
+import { UnauthorizedExceptionError } from 'src/errors/auth/UnanthorizedException';
 import { makeJwtVerifyAdapter } from 'src/factories/infra/cryptography/jwt';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class AuthGuard implements CanActivate {
       const { authorization }: any = request.headers;
 
       if (!authorization || authorization.trim() === '') {
-        throw new UnauthorizedException('Please provide a token.');
+        throw new UnauthorizedExceptionError('Please provide a token.');
       }
 
       const authToken = authorization.replace(/bearer/gim, '').trim();

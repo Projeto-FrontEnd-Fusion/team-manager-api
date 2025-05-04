@@ -6,19 +6,7 @@ export class CreateUserDto {
   @IsString()
   email: string;
 
-  @ApiProperty({ example: 'Jhon' })
-  @IsString()
-  firstName: string;
-
-  @ApiProperty({ example: 'Doe' })
-  @IsString()
-  lastName: string;
-
   @ApiProperty({ example: '********' })
   @IsString()
   password: string;
-
-  @ApiProperty({ example: '10/10/2002' })
-  @IsString()
-  birthDate: string;
 }

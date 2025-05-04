@@ -1,2 +1,7 @@
-export * from './jwt-sign-in-adapter';
-export * from './jwt-verify-adapter';
+import { JwtSignInAdapter } from './jwt-sign-in-adapter';
+import { JwtVerifyAdapter } from './jwt-verify-adapter';
+
+export {
+  JwtSignInAdapter,
+  JwtVerifyAdapter,
+}

@@ -26,6 +26,7 @@ export class UserService {
           createdAt: new Date().toISOString(),
           password: makeHashGeneratorAdapter().hash(payload.password),
           role: UserRoles.USER,
+          token: null
         },
         omit: {
           password: true,
@@ -37,6 +38,102 @@ export class UserService {
       return right(newUser)
     } catch (err) {
       return left(new Error(err))
+    }
+  }
+
+  async findByToken(token: string): Promise<Either<Error, PublicUserEntity>> {
+    try {
+      const userExists = await this.prismaService.user.findFirst({
+        where: { token: token }
+      })
+
+      if (!userExists) return left(
+        new NotFoundException(),
+      )
+
+      return right(userExists);
+    } catch (err) {
+      return left(new Error(err.message));
+    }
+  }
+
+  async findById(id: string): Promise<Either<Error | NotFoundException, PublicUserEntity>> {
+    try {
+      const user = await this.prismaService.user.findFirst({
+        where: { id: id },
+        omit: { password: true },
+        include: {
+          member: {
+            include: {
+              HardSkillsMembers: { select: { hardSkill: true } },
+              SoftSkillsMembers: { select: { softSkill: true } },
+              projects: true,
+              professionalProfiles: true
+            }
+          }
+        }
+      })
+
+      if (!user) return left(
+        new NotFoundException('Usuário não encontrado')
+      )
+
+      return right({
+        ...user,
+        member: {
+          ...user.member,
+          hardSkills: user.member?.HardSkillsMembers.map((hsm) => hsm.hardSkill) || [],
+          softSkills: user.member?.SoftSkillsMembers.map((ssm) => ssm.softSkill) || [],
+        },
+      });
+    } catch (err) {
+      return left(new Error(err.message))
+    }
+  }
+
+  async findByEmail(email: string): Promise<Either<Error | NotFoundException, PublicUserEntity>> {
+    try {
+      const user = await this.prismaService.user.findFirst({
+        where: { email: email },
+        omit: { password: true },
+        include: {
+          member: {
+            include: {
+              HardSkillsMembers: { select: { hardSkill: true } },
+              SoftSkillsMembers: { select: { softSkill: true } },
+              projects: true,
+              professionalProfiles: true
+            }
+          }
+        }
+      })
+
+      if (!user) return left(
+        new NotFoundException('Usuário não encontrado')
+      )
+
+      return right({
+        ...user,
+        member: {
+          ...user.member,
+          hardSkills: user.member?.HardSkillsMembers.map((hsm) => hsm.hardSkill) || [],
+          softSkills: user.member?.SoftSkillsMembers.map((ssm) => ssm.softSkill) || [],
+        },
+      });
+    } catch (err) {
+      return left(new Error(err.message))
+    }
+  }
+
+  async findMany(): Promise<Either<Error, UserEntity[] | []>> {
+    try {
+      const users = await this.prismaService.user.findMany();
+
+      if (!users) return left(new Error('Usuários não encontrados.'));
+
+      return right(users);
+    } catch (err) {
+      return left(new Error(err.message));
     }
   }
 
@@ -72,18 +169,6 @@ export class UserService {
       return right(updatedUser);
     } catch (err) {
       return left(new Error(err))
-    }
-  }
-
-  async findMany(): Promise<Either<Error, UserEntity[] | []>> {
-    try {
-      const users = await this.prismaService.user.findMany();
-
-      if (!users) return left(new Error('Usuários não encontrados.'));
-
-      return right(users);
-    } catch (err) {
-      return left(new Error(err.message));
     }
   }
 }

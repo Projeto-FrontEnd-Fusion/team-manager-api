@@ -1,3 +1,3 @@
 export interface Encrypter {
-  execute: (userId: string) => string;
+  execute: (email: string, userId: string) => string;
 }

@@ -13,6 +13,7 @@ model User {
   password  String
   role      String
   createdAt String  @map("created_at")
+  token     String? @unique(map: "user_token_uq")
   member    Member?
 
   @@map("users")
@@ -20,8 +21,8 @@ model User {
 
 model Member {
   id              String  @id @unique(map: "member_id_uq")
-  stack           String
   name            String
+  stack           String
   birthDate       String
   communityLevel  String  @map("community_level")
   currentSquad    String? @map("current_squad")

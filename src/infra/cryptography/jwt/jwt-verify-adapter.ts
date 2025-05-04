@@ -1,13 +1,14 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 export class JwtVerifyAdapter {
-  constructor(private readonly secretKey: string) {}
+  constructor(private readonly secretKey: string) { }
 
-  async execute(token: string): Promise<null | string> {
+  async execute(token: string): Promise<null | { email: string, userId: string }> {
     try {
-      const payload: any = jwt.verify(token, this.secretKey);
-      if (!payload.email) return null;
-      return payload.email;
+      const { email, userId, }: any = jwt.verify(token, this.secretKey);
+      if (!email) return null;
+      if (!userId) return null;
+      return { email, userId };
     } catch (err: any) {
       const errors = [
         'JsonWebTokenError',
@@ -23,4 +24,4 @@ export class JwtVerifyAdapter {
       throw new Error(err.message);
     }
   }
-}
+};

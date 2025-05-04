@@ -20,12 +20,8 @@ export class SkillController {
   constructor(private readonly hardSkillService: HardSkillService) { }
 
   @Post()
-  @ApiBody({
-    type: CreateHardSkillDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-  })
+  @ApiBody({ type: CreateHardSkillDto })
+  @ApiResponse({ status: HttpStatus.OK, })
   async createHardSkill(@Body() payload: CreateHardSkillDto) {
     const result = await this.hardSkillService.create(payload);
 

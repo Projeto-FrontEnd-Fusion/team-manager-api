@@ -14,8 +14,8 @@ import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
-    UserModule,
     AuthModule,
+    UserModule,
     ProjectModule,
     MemberModule,
     HardSkillModule,

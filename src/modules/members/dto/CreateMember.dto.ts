@@ -19,7 +19,10 @@ class ProfessionalProfileDto {
 }
 
 export class CreateMemberDto {
-  @ApiProperty({ description: 'Member Name', example: 'Jhon Doe' })
+  @ApiProperty({
+    description: 'Member Name',
+    example: 'Jhon Doe'
+  })
   @IsString()
   name: string;
 
@@ -27,7 +30,10 @@ export class CreateMemberDto {
   @IsString()
   userId: string;
 
-  @ApiProperty({ description: "Member's birth date", example: '10/10/2000' })
+  @ApiProperty({
+    description: "Member's birth date",
+    example: '10/10/2000'
+  })
   @IsString()
   birhDate: string;
 

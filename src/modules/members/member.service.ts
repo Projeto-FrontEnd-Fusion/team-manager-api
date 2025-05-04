@@ -13,6 +13,7 @@ import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { deleteFile } from '../shared/deleteFiles';
 import { Either, left, right } from '@utils/either';
 import { EmailAlreadyRegisteredError } from 'src/errors/user/EmailAlreadyRegistered';
+import { MemberNotFound } from 'src/errors/member/MemberNotFound';
 
 @Injectable()
 export class MemberService {
@@ -64,20 +65,10 @@ export class MemberService {
           professionalProfiles: true,
           projects: true,
           HardSkillsMembers: {
-            select: {
-              hardSkill: {
-                select: {
-                  id: true,
-                  name: true,
-                  createdAt: true,
-                }
-              }
-            },
+            select: { hardSkill: true },
           },
           SoftSkillsMembers: {
-            include: {
-              softSkill: true,
-            },
+            include: { softSkill: true },
           },
         },
       });
@@ -131,7 +122,6 @@ export class MemberService {
     }
   }
 
-  // TODO: Mudar o tipo de return
   async delete(
     id: string,
   ): Promise<Either<Error, Partial<MemberEntity> | any>> {
@@ -169,7 +159,7 @@ export class MemberService {
       });
 
       if (!memberExists) {
-        throw new NotFoundException('Membro não encontrado.');
+        return left(new MemberNotFound());
       }
 
       if (file.path && file.path !== memberExists.profileImageUrl) {

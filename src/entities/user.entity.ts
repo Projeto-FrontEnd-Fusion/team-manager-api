@@ -9,6 +9,7 @@ export type UserEntity = {
   role: string;
   createdAt: string;
   member?: MemberEntity;
+  token?: string;
 };
 
 export type PublicUserEntity = Omit<User, 'password'>;
