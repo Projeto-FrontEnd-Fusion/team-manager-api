@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { ProjectController } from './project.controller';
 import { ProjectService } from './project.service';
+import { right } from '@utils/either';
 
 describe('ProjectController', () => {
   let controller: ProjectController;
@@ -44,20 +46,21 @@ describe('ProjectController', () => {
         description: 'Descrição',
         url: 'www.google.com',
         cover: 'www.google.com',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         members: [],
       };
-      jest.spyOn(service, 'create').mockResolvedValue({
-        id: '1',
-        createdAt: new Date().toISOString(),
-        ...project,
-      });
+      jest.spyOn(service, 'create').mockResolvedValue(
+        right({
+          id: '1',
+          createdAt: new Date().toISOString(),
+          ...project,
+        }));
 
       const response = await controller.createProject(project);
 
       expect(response).toBeDefined();
       expect(service.create).toHaveBeenCalled();
-      expect(response.name).toBe('Team Manager API - Vingadores');
+      expect(response.data.name).toBe('Team Manager API - Vingadores');
     });
   });
 
@@ -70,12 +73,12 @@ describe('ProjectController', () => {
           description: 'Descrição',
           url: 'www.google.com',
           cover: 'www.google.com',
-          technologies: 'NodeJs',
+          technologies: ['NodeJs'],
           createdAt: new Date().toISOString(),
           members: [],
         },
       ];
-      jest.spyOn(service, 'findMany').mockResolvedValue(projects);
+      jest.spyOn(service, 'findMany').mockResolvedValue(right(projects));
 
       const response = await controller.findManyProjects();
 
@@ -92,10 +95,10 @@ describe('ProjectController', () => {
         description: 'Descrição',
         url: 'www.google.com',
         cover: 'www.google.com',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         createdAt: new Date().toISOString(),
       };
-      jest.spyOn(service, 'findById').mockResolvedValue(project);
+      jest.spyOn(service, 'findById').mockResolvedValue(right(project));
 
       const response = await controller.findProjectById('1');
 
@@ -131,7 +134,7 @@ describe('ProjectController', () => {
         description: 'Descrição',
         url: 'www.google.com',
         cover: 'www.google.com',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         createdAt: new Date().toISOString(),
       };
       const payload = {
@@ -139,11 +142,11 @@ describe('ProjectController', () => {
       };
       jest
         .spyOn(service, 'updateProject')
-        .mockResolvedValue({ ...project, ...payload });
+        .mockResolvedValue(right({ ...project, ...payload }));
 
       const response = await controller.updateProject('1', payload);
 
-      expect(response.name).toEqual('Frontend Fusion');
+      expect(response.data.name).toEqual('Frontend Fusion');
       expect(service.updateProject).toHaveBeenCalledWith('1', payload);
     });
   });

@@ -16,9 +16,9 @@ export class HttpProfessionalProfileMapper {
     };
   }
 
-  static ArrayToHttp(
-    professionalProfiles: ProfessionalProfileEntity[],
-  ): HttpProfessionalProfileEntity[] {
+  static ArrayToHttp(professionalProfiles: ProfessionalProfileEntity[]): HttpProfessionalProfileEntity[] | [] {
+    if (professionalProfiles.length === 0) return [];
+
     return professionalProfiles.map((professionalProfile) =>
       this.toHttp(professionalProfile),
     );

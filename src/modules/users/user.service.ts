@@ -1,13 +1,14 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { PrismaService } from "@infra/database/prisma/helpers/prisma.service";
-import { CreateUserDto } from "./dto/CreateUser.dto";
-import { Either, left, right } from "@utils/either";
-import { PublicUserEntity, UserEntity } from "src/entities";
-import { makeHashGeneratorAdapter } from "src/factories/infra/cryptography/bcrypt";
-import { UserRoles } from "src/types/RolesEnum";
-import { UpdateUserDto } from "./dto/UpdateUser.dto";
+import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
+import { CreateUserDto } from './dto/CreateUser.dto';
+import { Either, left, right } from '@utils/either';
+import { PublicUserEntity, UserEntity } from 'src/entities';
+import { makeHashGeneratorAdapter } from 'src/factories/infra/cryptography/bcrypt';
+import { UserRoles } from 'src/types/RolesEnum';
+import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { UserNotFound } from 'src/errors/user';
 
 @Injectable()
 export class UserService {
@@ -26,30 +27,28 @@ export class UserService {
           createdAt: new Date().toISOString(),
           password: makeHashGeneratorAdapter().hash(payload.password),
           role: UserRoles.USER,
-          token: null
+          token: null,
         },
         omit: {
           password: true,
-        }
-      })
+        },
+      });
 
-      this.logger.log(`User ${newUser.email}, id: ${newUser.id} created`)
+      this.logger.log(`[UserService - ${new Date().toLocaleString()}] ${newUser.email}, id: ${newUser.id} created`);
 
-      return right(newUser)
+      return right(newUser);
     } catch (err) {
-      return left(new Error(err))
+      return left(new Error(err));
     }
   }
 
   async findByToken(token: string): Promise<Either<Error, PublicUserEntity>> {
     try {
       const userExists = await this.prismaService.user.findFirst({
-        where: { token: token }
-      })
+        where: { token: token },
+      });
 
-      if (!userExists) return left(
-        new NotFoundException(),
-      )
+      if (!userExists) return left(new NotFoundException());
 
       return right(userExists);
     } catch (err) {
@@ -57,7 +56,9 @@ export class UserService {
     }
   }
 
-  async findById(id: string): Promise<Either<Error | NotFoundException, PublicUserEntity>> {
+  async findById(
+    id: string,
+  ): Promise<Either<Error | NotFoundException, PublicUserEntity>> {
     try {
       const user = await this.prismaService.user.findFirst({
         where: { id: id },
@@ -68,30 +69,32 @@ export class UserService {
               HardSkillsMembers: { select: { hardSkill: true } },
               SoftSkillsMembers: { select: { softSkill: true } },
               projects: true,
-              professionalProfiles: true
-            }
-          }
-        }
-      })
+              professionalProfiles: true,
+            },
+          },
+        },
+      });
 
-      if (!user) return left(
-        new NotFoundException('Usuário não encontrado')
-      )
+      if (!user) return left(new UserNotFound());
 
       return right({
         ...user,
         member: {
           ...user.member,
-          hardSkills: user.member?.HardSkillsMembers.map((hsm) => hsm.hardSkill) || [],
-          softSkills: user.member?.SoftSkillsMembers.map((ssm) => ssm.softSkill) || [],
+          hardSkills:
+            user.member?.HardSkillsMembers.map((hsm) => hsm.hardSkill) || [],
+          softSkills:
+            user.member?.SoftSkillsMembers.map((ssm) => ssm.softSkill) || [],
         },
       });
     } catch (err) {
-      return left(new Error(err.message))
+      return left(new Error(err.message));
     }
   }
 
-  async findByEmail(email: string): Promise<Either<Error | NotFoundException, PublicUserEntity>> {
+  async findByEmail(
+    email: string,
+  ): Promise<Either<Error | NotFoundException | UserNotFound, PublicUserEntity>> {
     try {
       const user = await this.prismaService.user.findFirst({
         where: { email: email },
@@ -102,26 +105,26 @@ export class UserService {
               HardSkillsMembers: { select: { hardSkill: true } },
               SoftSkillsMembers: { select: { softSkill: true } },
               projects: true,
-              professionalProfiles: true
-            }
-          }
-        }
-      })
+              professionalProfiles: true,
+            },
+          },
+        },
+      });
 
-      if (!user) return left(
-        new NotFoundException('Usuário não encontrado')
-      )
+      if (!user) return left(new UserNotFound());
 
       return right({
         ...user,
         member: {
           ...user.member,
-          hardSkills: user.member?.HardSkillsMembers.map((hsm) => hsm.hardSkill) || [],
-          softSkills: user.member?.SoftSkillsMembers.map((ssm) => ssm.softSkill) || [],
+          hardSkills:
+            user.member?.HardSkillsMembers.map((hsm) => hsm.hardSkill) || [],
+          softSkills:
+            user.member?.SoftSkillsMembers.map((ssm) => ssm.softSkill) || [],
         },
       });
     } catch (err) {
-      return left(new Error(err.message))
+      return left(new Error(err.message));
     }
   }
 
@@ -129,7 +132,7 @@ export class UserService {
     try {
       const users = await this.prismaService.user.findMany();
 
-      if (!users) return left(new Error('Usuários não encontrados.'));
+      if (!users) return left(new UserNotFound());
 
       return right(users);
     } catch (err) {
@@ -139,36 +142,33 @@ export class UserService {
 
   async update(
     id: string,
-    payload: UpdateUserDto
+    payload: UpdateUserDto,
   ): Promise<Either<Error, UpdateUserDto>> {
     try {
       const existsUser = await this.prismaService.user.findFirst({
-        where: { id: id }
-      })
+        where: { id: id },
+      });
 
-      if (!existsUser) return left(
-        new NotFoundException('Usuário não encontrado.')
-      )
+      if (!existsUser)
+        return left(new UserNotFound());
 
       const data = {
         password: payload.password
           ? makeHashGeneratorAdapter().hash(payload.password)
           : undefined,
-        email: payload.email
-          ? payload.email
-          : undefined
-      }
+        email: payload.email ? payload.email : undefined,
+      };
 
       const updatedUser = await this.prismaService.user.update({
         where: { id: id },
         data: {
-          ...data
-        }
-      })
+          ...data,
+        },
+      });
 
       return right(updatedUser);
     } catch (err) {
-      return left(new Error(err))
+      return left(new Error(err));
     }
   }
 }

@@ -7,6 +7,8 @@ import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 // import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { deleteFile } from '@modules/shared/deleteFiles';
+import { MemberEntity } from 'src/entities';
+import { MemberNotFound } from 'src/errors/member';
 
 jest.mock('@modules/shared/deleteFiles');
 
@@ -60,7 +62,7 @@ describe('MemberService', () => {
 
       expect(response).toBeDefined();
       expect(prismaService.member.create).toHaveBeenCalled();
-      expect(response.name).toBe('John Doe');
+      expect(response.value.name).toBe('John Doe');
     });
 
     it('should throw an error if creation fails', async () => {
@@ -72,6 +74,7 @@ describe('MemberService', () => {
         projects: [],
         hardSkills: [],
         softSkills: [],
+        userId: '1',
         stack: 'Full Stack',
       };
       (prismaService.member.create as jest.Mock).mockRejectedValue(
@@ -92,11 +95,11 @@ describe('MemberService', () => {
         expect(await service.findById('1')).toEqual(member);
       });
 
-      it('should throw BadRequestException if member not found', async () => {
+      it('should throw MemberNotFound if member not found', async () => {
         (prismaService.member.findFirst as jest.Mock).mockResolvedValue(null);
 
         await expect(service.findById('1')).rejects.toThrow(
-          BadRequestException,
+          MemberNotFound,
         );
       });
     });
@@ -130,6 +133,10 @@ describe('MemberService', () => {
           currentSquad: '',
           createdAt: '',
           profileImage: 'image.jpg',
+          hardSkills: [],
+          softSkills: [],
+          profileImageUrl: '',
+          userId: '1',
         };
         jest.spyOn(prismaService.member, 'findFirst').mockResolvedValue(member);
         jest.spyOn(prismaService.member, 'delete').mockResolvedValue(undefined);
@@ -162,7 +169,7 @@ describe('MemberService', () => {
           where: { id: '1' },
           data: { ...payload },
         });
-        expect(updatedMember.name).toEqual('Jane Doe');
+        expect(updatedMember.value.name).toEqual('Jane Doe');
       });
     });
   });

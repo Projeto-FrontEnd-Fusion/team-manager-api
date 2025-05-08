@@ -1,3 +1,3 @@
-import { MemberNotFound } from "./MemberNotFound";
+import { MemberNotFound } from './MemberNotFound';
 
 export { MemberNotFound };

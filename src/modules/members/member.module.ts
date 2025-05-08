@@ -10,4 +10,4 @@ import { PrismaModule } from '@infra/database/prisma/helpers/prisma.module';
   providers: [MemberService],
   exports: [MemberService],
 })
-export class MemberModule { }
+export class MemberModule {}

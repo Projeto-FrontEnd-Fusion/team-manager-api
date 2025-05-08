@@ -1,3 +1,3 @@
-import { UnauthorizedExceptionError } from './UnanthorizedException'
+import { UnauthorizedExceptionError } from './UnanthorizedException';
 
 export { UnauthorizedExceptionError };

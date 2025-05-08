@@ -1,11 +1,16 @@
-export type HardSkillsEntity = {
+type HardSkillsEntity = {
   id: string;
   name: string;
   createdAt: string;
 };
 
-export type HttpHardSkillEntity = {
+type HttpHardSkillEntity = {
   id: string;
   name: string;
   created_at: string;
+};
+
+export {
+  HardSkillsEntity,
+  HttpHardSkillEntity,
 };

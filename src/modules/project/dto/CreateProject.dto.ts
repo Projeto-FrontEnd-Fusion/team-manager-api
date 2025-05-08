@@ -39,9 +39,10 @@ export class CreateProjectDto {
     description: 'Technologies used in the project',
     maxLength: 250,
     examples: ['Java', 'JavaScript', 'Python'],
+    default: ["Typescript", "Javascript", "Python"]
   })
   @IsArray()
-  technologies?: string;
+  technologies?: string[];
 
   @ApiProperty({
     description: 'URL of the project',
@@ -50,13 +51,6 @@ export class CreateProjectDto {
   @IsNotEmpty()
   @IsUrl()
   url: string;
-
-  @ApiProperty({
-    description: 'Members of the project',
-    example: ['423242', '23124'],
-  })
-  @IsArray()
-  members: string[];
 
   @ApiProperty({
     description: 'Imagem do projeto',

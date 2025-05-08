@@ -9,7 +9,8 @@ export class HttpHardSkillsMapper {
     };
   }
 
-  static ArrayToHttp(skills: HardSkillsEntity[]): HttpHardSkillEntity[] {
+  static ArrayToHttp(skills: HardSkillsEntity[]): HttpHardSkillEntity[] | [] {
+    if (skills.length === 0) return [];
     return skills.map((skill) => this.toHttp(skill));
   }
 }

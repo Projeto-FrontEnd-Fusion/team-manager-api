@@ -13,6 +13,7 @@ import {
 
 import { CreateHardSkillDto } from './dto/CreateHardSkill.dto';
 import { HardSkillService } from './hardSkill.service';
+import { ResponseSend } from '@modules/shared/responseSend';
 
 @ApiTags('Hard Skill')
 @Controller('hard-skills')
@@ -21,21 +22,21 @@ export class SkillController {
 
   @Post()
   @ApiBody({ type: CreateHardSkillDto })
-  @ApiResponse({ status: HttpStatus.OK, })
+  @ApiResponse({ status: HttpStatus.CREATED })
   async createHardSkill(@Body() payload: CreateHardSkillDto) {
     const result = await this.hardSkillService.create(payload);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.CREATED,
+    );
   }
 
   @Get(':id')
@@ -43,17 +44,17 @@ export class SkillController {
   async findSkillById(@Param('id') id: string) {
     const result = await this.hardSkillService.findById(id);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Get()
@@ -61,17 +62,17 @@ export class SkillController {
   async findManySkills() {
     const result = await this.hardSkillService.findMany();
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST
+    )
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Delete(':id')
@@ -79,17 +80,17 @@ export class SkillController {
   async deleteSkill(@Param('id') id: string) {
     const result = await this.hardSkillService.delete(id);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Patch(':id')
@@ -100,16 +101,16 @@ export class SkillController {
   ) {
     const result = await this.hardSkillService.update(id, payload);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 }

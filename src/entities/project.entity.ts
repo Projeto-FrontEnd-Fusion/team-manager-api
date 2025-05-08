@@ -1,4 +1,4 @@
-import { HttpMemberEntity, MemberEntity } from './member.entity';
+import { HttpMemberEntity } from './member.entity';
 
 export type ProjectEntity = {
   id: string;
@@ -7,8 +7,9 @@ export type ProjectEntity = {
   description: string;
   technologies: string[];
   url: string;
-  members?: Partial<MemberEntity>[];
+  members?: HttpMemberEntity[] | { id: string }[] | string[];
   createdAt: string;
+  updatedAt?: string;
 };
 
 export type HttpMemberInProjectEntity = {
@@ -18,11 +19,12 @@ export type HttpMemberInProjectEntity = {
 
 export type HttpProjectEntity = {
   id: string;
-  project_cover: string;
-  project_name: string;
+  name: string;
+  cover: string;
   description: string;
   technologies: string[];
-  members: HttpMemberEntity[] | { id: string }[];
-  projectUrl: string;
+  members?: HttpMemberEntity[] | { id: string }[] | string[];
+  url: string;
   created_at: string;
+  updated_at?: string;
 };

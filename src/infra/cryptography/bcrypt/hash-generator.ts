@@ -6,7 +6,7 @@ export interface HashGenerator {
 }
 
 export class HashGeneratorAdapter implements HashGenerator {
-  constructor() { }
+  constructor() {}
 
   hash(password: string): string {
     return bcrypt.hashSync(password, 2);

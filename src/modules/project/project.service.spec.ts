@@ -38,8 +38,7 @@ describe('ProjectService', () => {
       url: '',
       description: '',
       cover: '',
-      technologies: 'NodeJs',
-      members: [],
+      technologies: ['NodeJs'],
     };
   });
 
@@ -54,14 +53,14 @@ describe('ProjectService', () => {
           id: '1',
           createdAt: new Date().toISOString(),
           cover: '',
-          technologies: 'NodeJs',
+          technologies: ['NodeJs'],
           ...newProject,
         },
       ];
-      createdAt: new Date().toISOString(),
-        jest
-          .spyOn(prismaService.projects, 'findMany')
-          .mockResolvedValue(projects);
+
+      jest
+        .spyOn(prismaService.projects, 'findMany')
+        .mockResolvedValue(projects);
 
       expect(await projectService.findMany()).toEqual(projects);
     });
@@ -84,21 +83,19 @@ describe('ProjectService', () => {
   describe('create', () => {
     it('should create a new project', async () => {
       const project = {
-        id: '1',
         name: 'Team Manager API - Vingadores',
         description: 'Descrição',
         url: 'www.google.com',
         cover: 'www.google.com',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         createdAt: new Date().toISOString(),
       };
-      jest.spyOn(prismaService.projects, 'create').mockResolvedValue(project);
 
       const response = await projectService.create(project);
 
       expect(response).toBeDefined();
       expect(prismaService.projects.create).toHaveBeenCalled();
-      expect(response.name).toBe('Team Manager API - Vingadores');
+      expect(response.value.name).toBe('Team Manager API - Vingadores');
     });
 
     it('should throw BadRequestException if error', async () => {
@@ -108,7 +105,7 @@ describe('ProjectService', () => {
         name: 'Frontend Fusion',
         description: '',
         cover: '',
-        technologies: '',
+        technologies: [''],
         url: '',
         member: ['1'],
         createdAt: new Date().toISOString(),
@@ -131,7 +128,7 @@ describe('ProjectService', () => {
         id: '1',
         createdAt: new Date().toISOString(),
         cover: '',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         ...newProject,
       };
       jest
@@ -156,7 +153,7 @@ describe('ProjectService', () => {
         id: '1',
         name: 'Frontend Fusion',
         cover: 'image.jpg',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         description: '',
         url: '',
         createdAt: new Date().toISOString(),
@@ -190,7 +187,7 @@ describe('ProjectService', () => {
         id: '1',
         createdAt: new Date().toISOString(),
         cover: '',
-        technologies: 'NodeJs',
+        technologies: ['NodeJs'],
         ...newProject,
       };
       const payload = {
@@ -207,7 +204,7 @@ describe('ProjectService', () => {
         where: { id: '1' },
         data: { ...updatedProject },
       });
-      expect(updatedProject.name).toEqual('Frontend Fusion');
+      expect(updatedProject.value.name).toEqual('Frontend Fusion');
     });
   });
 });

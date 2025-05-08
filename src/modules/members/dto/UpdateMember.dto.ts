@@ -5,7 +5,7 @@ export class UpdateMemberDto {
   @ApiProperty({
     description: 'Name of the member',
     example: 'Pedro',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -29,7 +29,7 @@ export class UpdateMemberDto {
 
   @ApiProperty({
     description: 'Current squad of the member',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -48,7 +48,7 @@ export class UpdateMemberDto {
 
   @ApiProperty({
     description: 'Your professional platform',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -56,7 +56,7 @@ export class UpdateMemberDto {
 
   @ApiProperty({
     description: 'Array of Technical Hard Skills',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -64,7 +64,7 @@ export class UpdateMemberDto {
 
   @ApiProperty({
     description: 'Array of Soft Skills',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -89,5 +89,5 @@ export class UpdateMemberDto {
   })
   @IsOptional()
   @IsArray()
-  projectsIds: string[];
+  projectsIds?: string[];
 }

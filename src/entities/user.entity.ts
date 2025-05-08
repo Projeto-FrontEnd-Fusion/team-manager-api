@@ -17,7 +17,6 @@ export type PublicUserEntity = Omit<User, 'password'>;
 export type HttpPublicUserEntity = {
   id: string;
   email: string;
-  birth_date: number;
   role: UserRoles;
   created_at: string;
   member?: HttpMemberEntity;

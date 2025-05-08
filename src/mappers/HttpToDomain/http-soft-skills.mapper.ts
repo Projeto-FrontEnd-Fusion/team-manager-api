@@ -9,7 +9,8 @@ export class HttpSoftSkillsMapper {
     };
   }
 
-  static ArrayToHttp(skills: SoftSkillsEntity[]): HttpSoftSkillsEntity[] {
+  static ArrayToHttp(skills: SoftSkillsEntity[]): HttpSoftSkillsEntity[] | [] {
+    if (skills.length === 0) return [];
     return skills.map((skill) => this.toHttp(skill));
   }
 }

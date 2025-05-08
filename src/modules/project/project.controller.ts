@@ -1,4 +1,4 @@
-import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -15,11 +15,14 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+import {
+  ProjectRequestTransformInterceptor,
+  ProjectResponseTransformInterceptor
+} from 'src/interceptors';
 import { CreateProjectDto } from './dto/CreateProject.dto';
-import { ProjectRequestTransformInterceptor } from '@interceptors/index';
-import { ProjectResponseTransformInterceptor } from '@interceptors/index';
 import { ProjectService } from './project.service';
 import { multerConfig } from '@configs/multer.config';
+import { ResponseSend } from '@modules/shared/responseSend';
 
 @ApiTags('Projects')
 @UseInterceptors(ProjectResponseTransformInterceptor)
@@ -28,34 +31,38 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) { }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file', multerConfig('project')))
-  @UseInterceptors(ProjectRequestTransformInterceptor)
-  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('file', multerConfig('project')),
+    ProjectRequestTransformInterceptor
+  )
+  @ApiBody({ type: CreateProjectDto })
   @HttpCode(HttpStatus.CREATED)
   async createProject(
     @Body() data: CreateProjectDto,
     @UploadedFile(
-      new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
-        fileIsRequired: false,
-        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-      }),
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({ maxSize: 1024 * 1024 }) // bytes
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
     )
     file?: Express.Multer.File,
   ) {
     if (file) data.cover = file.path;
     const result = await this.projectService.create(data);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Get(':projectId')
@@ -63,72 +70,87 @@ export class ProjectController {
   async findProjectById(@Param('projectId') projectId: string) {
     const result = await this.projectService.findById(projectId);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiResponse({})
   async findManyProjects() {
     const result = await this.projectService.findMany();
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
+  }
+
+  @Patch(':projectId')
+  @UseInterceptors(
+    FileInterceptor('file', multerConfig('project')),
+    ProjectRequestTransformInterceptor
+  )
+  @HttpCode(HttpStatus.OK)
+  async updateProject(
+    @Param('projectId') projectId: string,
+    @Body() payload,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({ maxSize: 2 * 1024 * 1024 }) // 2 MegaBytes
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
+    )
+    file?: Express.Multer.File,
+  ) {
+    if (file) payload.cover = file.path;
+    const result = await this.projectService.updateProject(projectId, payload);
+
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Delete(':projectId')
   @HttpCode(HttpStatus.OK)
-  async deleteProjectById(@Param('projetId') projectId: string) {
+  async deleteProjectById(@Param('projectId') projectId: string) {
     const result = await this.projectService.delete(projectId);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
-  }
-
-  @Patch(':projectId')
-  @UseInterceptors(FileInterceptor('file', multerConfig('project')))
-  @HttpCode(HttpStatus.OK)
-  async updateProject(@Param('projectId') projectId: string, @Body() payload) {
-    const result = await this.projectService.updateProject(projectId, payload);
-
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
-
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 }

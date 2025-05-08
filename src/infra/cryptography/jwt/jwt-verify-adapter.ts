@@ -1,11 +1,13 @@
 import * as jwt from 'jsonwebtoken';
 
 export class JwtVerifyAdapter {
-  constructor(private readonly secretKey: string) { }
+  constructor(private readonly secretKey: string) {}
 
-  async execute(token: string): Promise<null | { email: string, userId: string }> {
+  async execute(
+    token: string,
+  ): Promise<null | { email: string; userId: string }> {
     try {
-      const { email, userId, }: any = jwt.verify(token, this.secretKey);
+      const { email, userId }: any = jwt.verify(token, this.secretKey);
       if (!email) return null;
       if (!userId) return null;
       return { email, userId };
@@ -24,4 +26,4 @@ export class JwtVerifyAdapter {
       throw new Error(err.message);
     }
   }
-};
+}

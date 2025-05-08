@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
-import { DomainMemberMapper } from 'src/mappers/DomainToHttp/domain-member.mapper';
+import { DomainMemberMapper } from 'src/mappers';
 
 @Injectable()
 export class MemberRequestTransformInterceptor implements NestInterceptor {

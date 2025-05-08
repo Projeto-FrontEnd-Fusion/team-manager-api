@@ -10,12 +10,9 @@ export class JwtSignInAdapter implements Encrypter {
   }
 
   execute(userId: string, email: string): string {
-    console.log(userId, email);
-    const token = jwt.sign(
-      { userId: userId, email: email, },
-      this.secretKey,
-      { expiresIn: '1h' }
-    );
+    const token = jwt.sign({ userId: userId, email: email }, this.secretKey, {
+      expiresIn: '1h',
+    });
 
     return token;
   }

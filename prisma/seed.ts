@@ -151,22 +151,40 @@ async function createMembers() {
     {
       id: '1',
       userId: '1',
-      birthDate: '10/10/2025',
       communityLevel: 'Senior',
       name: 'Pedro',
       stack: 'Senior',
       currentSquad: 'Dragons',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      professionalProfiles: [
+        {
+          platform: 'linkedin',
+          url: 'https://www.linkedin.com/in/pedro-senior-4002'
+        },
+        {
+          platform: 'instagram',
+          url: 'https://www.instagram.com/pedro-senior-4002'
+        }
+      ]
     },
     {
       id: '2',
       userId: '2',
-      birthDate: '10/10/2025',
       communityLevel: 'Senior',
       name: 'Joao',
       stack: 'Junior',
       currentSquad: 'Vingadores',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      professionalProfiles: [
+        {
+          platform: 'linkedin',
+          url: 'https://www.linkedin.com/in/joao-junior-4002',
+        },
+        {
+          platform: 'instagram',
+          url: 'https://www.instagram.com/joao-junior-4002',
+        }
+      ]
     }
   ]
 
@@ -177,7 +195,61 @@ async function createMembers() {
     const notIncluded = data.filter(({ userId }) => !members.includes({ userId }))
 
     await prisma.member.createMany({
-      data: notIncluded
+      data: notIncluded.map(({ professionalProfiles, ...member }) => member),
+    });
+
+    for (const member of notIncluded) {
+      for (const profile of member.professionalProfiles) {
+        await prisma.professionalProfile.create({
+          data: {
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString(),
+            ...profile,
+            member: {
+              connect: { id: member.id },
+            },
+          },
+        });
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function createProjects() {
+  const data = {
+    id: "1",
+    name: "Project Fusion",
+    cover: "https://avatars.githubusercontent.com/u/161888104?s=200&v=4",
+    description: "A project designed to help people to learn about frontend and backend development, a way to prepare then to job markets.",
+    technologies: [
+      "react",
+      "nodejs",
+      "next",
+      "vite",
+      "figma",
+      "git",
+    ],
+    url: "https://github.com/your-username/project-repo",
+    createdAt: new Date().toISOString()
+  }
+
+
+  try {
+    await prisma.projects.create({
+      data: data
+    })
+
+    await prisma.projects.update({
+      where: { id: data.id },
+      data: {
+        members: {
+          connect: [
+            { id: data.id }
+          ]
+        }
+      }
     })
   } catch (err) {
     console.log(err);
@@ -189,6 +261,7 @@ async function main() {
   await createSoftSkills();
   await createUsers();
   await createMembers();
+  await createProjects();
 }
 
 main()

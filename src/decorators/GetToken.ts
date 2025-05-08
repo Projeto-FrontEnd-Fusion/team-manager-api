@@ -1,6 +1,6 @@
-import { createParamDecorator, ExecutionContext } from "@nestjs/common";
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-import { UnauthorizedExceptionError } from "src/errors/auth/UnanthorizedException";
+import { UnauthorizedExceptionError } from 'src/errors/auth/UnanthorizedException';
 
 export const GetToken = createParamDecorator(
   (data: string, ctx: ExecutionContext) => {
@@ -12,5 +12,5 @@ export const GetToken = createParamDecorator(
     }
 
     return token;
-  }
-)
+  },
+);

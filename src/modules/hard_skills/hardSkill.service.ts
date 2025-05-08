@@ -1,16 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CreateHardSkillDto } from './dto/CreateHardSkill.dto';
 import { HardSkillsEntity } from 'src/entities';
 import { PrismaService } from '@infra/database/prisma/helpers/prisma.service';
 import { Either, left, right } from '@utils/either';
+import { HardSkillNotFounded } from 'src/errors/hardSkills';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaClientError } from 'src/types/PrismaErrors';
 
 @Injectable()
 export class HardSkillService {
+  private readonly logger = new Logger(HardSkillService.name);
+
   constructor(private readonly prismaService: PrismaService) { }
 
-  async create(payload: CreateHardSkillDto): Promise<Either<Error, HardSkillsEntity>> {
+  async create(
+    payload: CreateHardSkillDto,
+  ): Promise<Either<Error | BadRequestException, HardSkillsEntity>> {
     try {
       const newHardSkill = await this.prismaService.hardSkills.create({
         data: {
@@ -20,25 +27,37 @@ export class HardSkillService {
         },
       });
 
+      this.logger.log(`[HardSkillService - ${new Date().toLocaleString()}] Hard Skill ${newHardSkill.name} created.`)
+
       return right(newHardSkill);
-    } catch (error) {
+    } catch (err) {
+      this.logger.error(`[HardSkillService - ${new Date().toLocaleString()}] `, err);
+      if (err instanceof PrismaClientKnownRequestError) {
+        switch (err.code) {
+          case PrismaClientError.UNIQUE_CONSTRAINT_FAILED:
+            return left(new BadRequestException('Hard Skill com esse nome já existe.'));
+          default:
+            break;
+        }
+      }
       return left(new Error('Não foi possivel criar uma nova skill.'));
     }
   }
 
-  async findById(id: string): Promise<Either<NotFoundException | Error, HardSkillsEntity>> {
+  async findById(id: string,): Promise<
+    Either<NotFoundException | Error | HardSkillNotFounded, HardSkillsEntity>
+  > {
     try {
       const skill = await this.prismaService.hardSkills.findFirst({
         where: { id: id },
       });
 
-      if (!skill) {
-        return left(new NotFoundException('Skill não encontrada.'));
-      }
+      if (!skill) return left(new HardSkillNotFounded());
 
       return right(skill);
-    } catch (error) {
-      return left(new Error(error));
+    } catch (err) {
+      this.logger.error(`[HardSkillService - ${new Date().toLocaleString()}] `, err);
+      return left(new Error(err));
     }
   }
 
@@ -51,48 +70,57 @@ export class HardSkillService {
           createdAt: true,
         },
       });
+
       return right(data);
     } catch (err) {
+      this.logger.error(`[HardSkillService - ${new Date().toLocaleString()}] `, err);
       return left(new Error(err));
     }
   }
 
-  async delete(id: string): Promise<Either<NotFoundException | Error, HardSkillsEntity | void>> {
+  async delete(
+    id: string,
+  ): Promise<Either<NotFoundException | Error, HardSkillsEntity | void>> {
     try {
-      const skill = this.prismaService.hardSkills.delete({
+      const hardSkillDeleted = await this.prismaService.hardSkills.delete({
         where: { id: id },
       });
 
-      if (!skill) {
-        throw new NotFoundException('Skill não encontrada.');
-      }
+      if (!hardSkillDeleted) return left(new HardSkillNotFounded());
+
+      this.logger.log(`[HardSkillService - ${new Date().toLocaleString()}] Hard Skill ${hardSkillDeleted.name} (${hardSkillDeleted.id}) deleted.`)
 
       return right();
-    } catch (error) {
-      return left(new Error(error));
+    } catch (err) {
+      this.logger.error(`[HardSkillService - ${new Date().toLocaleString()}] `, err);
+      return left(new Error(err));
     }
   }
 
-  async update(id: string, payload: Partial<HardSkillsEntity>): Promise<Either<NotFoundException | Error, HardSkillsEntity>> {
+  async update(
+    id: string,
+    payload: Partial<HardSkillsEntity>,
+  ): Promise<Either<NotFoundException | Error, HardSkillsEntity>> {
     try {
-      const skill = await this.prismaService.hardSkills.findFirst({
+      const hardSkillExists = await this.prismaService.hardSkills.findFirst({
         where: { id: id },
       });
 
-      if (!skill) {
-        return left(new NotFoundException('Skill não encontrada.'));
-      }
+      if (!hardSkillExists) return left(new HardSkillNotFounded());
 
-      const result = await this.prismaService.hardSkills.update({
+      const hardSkillUpdated = await this.prismaService.hardSkills.update({
         where: { id: id },
         data: {
-          name: payload.name || skill.name,
+          name: payload.name || hardSkillExists.name,
         },
       });
 
-      return right(result);
+      this.logger.log(`[HardSkillService - ${new Date().toLocaleString()}] Hard Skill ${hardSkillUpdated.name} (${hardSkillUpdated.id})`);
+
+      return right(hardSkillUpdated);
     } catch (err) {
-      return left(new Error(err))
+      this.logger.error(`[HardSkillService - ${new Date().toLocaleString()}] `, err);
+      return left(new Error(err));
     }
   }
 }

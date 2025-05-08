@@ -1,6 +1,6 @@
-import * as dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-dotenv.config();
+config();
 
 export const env = {
   JWt_SECRET_KEY: process.env.JWt_SECRET_KEY || '',

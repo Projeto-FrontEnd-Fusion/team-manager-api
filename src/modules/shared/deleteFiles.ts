@@ -1,14 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { promises, constants } from 'fs';
+import { resolve } from 'path';
 
 export async function deleteFile(fileName: string): Promise<boolean> {
-  const uploadPath = path.join(__dirname, '../../..', fileName);
+  const uploadPath = resolve(process.cwd(), '', fileName);
+  console.log('Deleting file at:', uploadPath);
 
   try {
-    await fs.promises.access(uploadPath, fs.constants.F_OK);
-    await fs.promises.unlink(uploadPath);
+    await promises.access(uploadPath, constants.F_OK);
+    await promises.unlink(uploadPath);
     return true;
   } catch (error) {
+    console.error('Erro ao deletar arquivo:', error);
     throw new Error(`Erro ao deletar o arquivo ${fileName}.`);
   }
 }

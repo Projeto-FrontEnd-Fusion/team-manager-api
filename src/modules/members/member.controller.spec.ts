@@ -72,6 +72,8 @@ describe('MemberController', () => {
         communityLevel: 'Senior',
         currentSquad: 'Eagles',
         hardSkills: ['1', '2'],
+        softSkills: ['1', '2'],
+        userId: '1',
         professionalProfiles: [
           {
             platform: 'linkedin',
@@ -95,7 +97,7 @@ describe('MemberController', () => {
 
   describe('findMany', () => {
     it('should return all members', async () => {
-      const result = await controller.findAllMembers();
+      const result = await controller.findManyMembers();
 
       expect(service.findMany).toHaveBeenCalled();
       expect(result).toEqual([

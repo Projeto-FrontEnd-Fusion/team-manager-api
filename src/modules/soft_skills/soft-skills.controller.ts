@@ -6,12 +6,14 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
-  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
 import { CreateSoftSkillDto } from './dto/CreateSoftSkill.dto';
 import { SoftSkillService } from './soft-skills.service';
+import { ResponseSend } from '@modules/shared/responseSend';
 
 @ApiTags('Soft Skills')
 @Controller('soft-skills')
@@ -23,17 +25,17 @@ export class SoftSkillController {
   async createSoftSkill(@Body() payload: CreateSoftSkillDto) {
     const result = await this.softSkillService.create(payload);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Get()
@@ -41,17 +43,17 @@ export class SoftSkillController {
   async findManySoftSkills() {
     const result = await this.softSkillService.findMany();
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Get(':id')
@@ -59,17 +61,17 @@ export class SoftSkillController {
   async findSoftSkillById(@Param('id') id: string) {
     const result = await this.softSkillService.findById(id);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Delete(':id')
@@ -77,20 +79,20 @@ export class SoftSkillController {
   async deleteSoftSkillById(@Param('id') id: string) {
     const result = await this.softSkillService.delete(id);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
-  @Put(':id')
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -98,16 +100,16 @@ export class SoftSkillController {
   ) {
     const result = await this.softSkillService.update(id, payload);
 
-    if (result.isLeft()) return {
-      data: null,
-      message: result.value.message,
-      statusCode: HttpStatus.BAD_REQUEST
-    }
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
 
-    return {
-      data: result.value,
-      message: null,
-      statusCode: HttpStatus.OK
-    }
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 }

@@ -10,15 +10,14 @@ export class DomainMemberMapper {
       return {
         id: member.id,
         name: member.name,
-        birthDate: member.birth_date,
+        userId: member.user_id,
         profileImage: member.profile_image,
         stack: member.stack,
         communityLevel: member.community_level,
         createdAt: member.created_at,
         updatedAt: member.updated_at,
         professionalProfiles:
-          member.professional_profiles &&
-            member.professional_profiles.length > 0
+          (member.professional_profiles && member.professional_profiles.length > 0)
             ? DomainProfessionalProfileMapper.ArrayToDomain(
               member.professional_profiles,
             )

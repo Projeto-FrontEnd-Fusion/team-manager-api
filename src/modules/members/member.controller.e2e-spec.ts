@@ -38,6 +38,7 @@ describe('MemberController (e2e)', () => {
       currentSquad: 'Eagles',
       hardSkills: ['Java', 'JavaScript'],
       softSkills: [],
+      userId: '1',
       professionalProfiles: [
         {
           platform: 'linkedin',

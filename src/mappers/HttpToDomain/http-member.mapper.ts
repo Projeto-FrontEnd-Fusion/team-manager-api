@@ -9,7 +9,7 @@ export class HttpMemberMapper {
     return {
       id: member.id,
       name: member.name,
-      birth_date: member.birthDate,
+      user_id: member.userId,
       profile_image: member.profileImage,
       stack: member.stack,
       community_level: member.communityLevel,
@@ -29,7 +29,8 @@ export class HttpMemberMapper {
     };
   }
 
-  static ArrayToHttp(members: MemberEntity[]): HttpMemberEntity[] {
+  static ArrayToHttp(members: MemberEntity[]): HttpMemberEntity[] | [] {
+    if (members.length === 0) return [];
     return members.map((member) => this.toHttp(member));
   }
 }

@@ -10,14 +10,14 @@ export type MemberEntity = {
   id: string;
   stack: string;
   name: string;
-  birthDate: string;
+  userId: string;
   communityLevel: string;
   currentSquad?: string;
   profileImage?: string;
   createdAt: string;
   updatedAt?: string;
-  hardSkills: HardSkillsEntity[] | [];
-  softSkills: SoftSkillsEntity[] | [];
+  hardSkills?: HardSkillsEntity[] | [];
+  softSkills?: SoftSkillsEntity[] | [];
   professionalProfiles?: ProfessionalProfileEntity[] | [];
   projects?: ProjectEntity[] | [];
 };
@@ -25,14 +25,14 @@ export type MemberEntity = {
 export type HttpMemberEntity = {
   id: string;
   name: string;
-  birth_date: string;
+  user_id: string;
   profile_image?: string;
   stack: string;
   community_level: string;
   created_at: string;
   updated_at?: string;
-  professional_profiles: HttpProfessionalProfileEntity[];
-  hardSkills: HttpHardSkillEntity[];
-  softSkills: HttpSoftSkillsEntity[];
-  projects: HttpProjectEntity[];
+  professional_profiles?: HttpProfessionalProfileEntity[];
+  hardSkills?: HttpHardSkillEntity[];
+  softSkills?: HttpSoftSkillsEntity[];
+  projects?: HttpProjectEntity[];
 };
