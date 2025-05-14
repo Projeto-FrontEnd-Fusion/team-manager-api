@@ -11,11 +11,13 @@ import { HardSkillModule } from '@modules/hard_skills/hardSkill.module';
 import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
 import { UserModule } from '@modules/users/user.module';
 import { AuthModule } from '@modules/auth/auth.module';
+import { ProfessionalProfileModule } from '@modules/professional_profiles/professionalProfiles.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    ProfessionalProfileModule,
     ProjectModule,
     MemberModule,
     HardSkillModule,
@@ -50,4 +52,4 @@ import { AuthModule } from '@modules/auth/auth.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
