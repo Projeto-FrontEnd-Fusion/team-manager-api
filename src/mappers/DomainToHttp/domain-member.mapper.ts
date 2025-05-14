@@ -23,15 +23,15 @@ export class DomainMemberMapper {
             )
             : [],
         hardSkills:
-          member.hardSkills && member.hardSkills.length > 0
+          (member.hardSkills && member.hardSkills.length > 0)
             ? DomainHardSkillsMapper.ArrayToDomain(member.hardSkills)
             : [],
         softSkills:
-          member.softSkills && member.softSkills.length > 0
+          (member.softSkills && member.softSkills.length > 0)
             ? DomainSoftSkillsMapper.ArrayToDomain(member.softSkills)
             : [],
         projects:
-          member.projects && member.projects.length > 0
+          (member.projects && member.projects.length > 0)
             ? DomainProjectMapper.ArrayToDomain(member.projects)
             : [],
       };

@@ -1,4 +1,4 @@
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -22,7 +22,7 @@ export class SkillController {
 
   @Post()
   @ApiBody({ type: CreateHardSkillDto })
-  @ApiResponse({ status: HttpStatus.CREATED })
+  @HttpCode(HttpStatus.OK)
   async createHardSkill(@Body() payload: CreateHardSkillDto) {
     const result = await this.hardSkillService.create(payload);
 

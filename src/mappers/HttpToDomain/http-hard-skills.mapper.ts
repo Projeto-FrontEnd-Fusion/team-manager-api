@@ -1,16 +1,16 @@
 import { HardSkillsEntity, HttpHardSkillEntity } from 'src/entities';
 
 export class HttpHardSkillsMapper {
-  static toHttp(skill: HardSkillsEntity): HttpHardSkillEntity {
+  static toHttp({ hardSkill }: { hardSkill: HardSkillsEntity }): HttpHardSkillEntity {
     return {
-      id: skill.id,
-      name: skill.name,
-      created_at: skill.createdAt,
+      id: hardSkill.id,
+      name: hardSkill.name,
+      created_at: hardSkill.createdAt,
     };
   }
 
-  static ArrayToHttp(skills: HardSkillsEntity[]): HttpHardSkillEntity[] | [] {
-    if (skills.length === 0) return [];
-    return skills.map((skill) => this.toHttp(skill));
+  static ArrayToHttp(hardSkills: { hardSkill: HardSkillsEntity }[] | []): HttpHardSkillEntity[] | [] {
+    if (hardSkills.length === 0) return [];
+    return hardSkills.map((hardSkill) => this.toHttp(hardSkill));
   }
 }

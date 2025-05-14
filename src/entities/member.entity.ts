@@ -22,6 +22,22 @@ export type MemberEntity = {
   projects?: ProjectEntity[] | [];
 };
 
+export type DomainMemberEntity = {
+  id: string;
+  stack: string;
+  name: string;
+  userId: string;
+  communityLevel: string;
+  currentSquad?: string;
+  profileImage?: string;
+  createdAt: string;
+  updatedAt?: string;
+  HardSkillsMembers?: { hardSkill: HardSkillsEntity }[];
+  SoftSkillsMembers?: { softSkill: SoftSkillsEntity }[];
+  professionalProfiles?: ProfessionalProfileEntity[] | [];
+  projects?: ProjectEntity[] | [];
+}
+
 export type HttpMemberEntity = {
   id: string;
   name: string;

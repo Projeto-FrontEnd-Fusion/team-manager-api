@@ -3,9 +3,10 @@ import { HttpHardSkillsMapper } from './http-hard-skills.mapper';
 import { HttpProfessionalProfileMapper } from './http-professional-profile.mapper';
 import { HttpProjectMapper } from './http-project.mapper';
 import { HttpSoftSkillsMapper } from './http-soft-skills.mapper';
+import { DomainMemberEntity } from 'src/entities/member.entity';
 
 export class HttpMemberMapper {
-  static toHttp(member: MemberEntity): HttpMemberEntity {
+  static toHttp(member: DomainMemberEntity): HttpMemberEntity {
     return {
       id: member.id,
       name: member.name,
@@ -19,11 +20,11 @@ export class HttpMemberMapper {
         member.professionalProfiles &&
         HttpProfessionalProfileMapper.ArrayToHttp(member.professionalProfiles),
       hardSkills:
-        member.hardSkills &&
-        HttpHardSkillsMapper.ArrayToHttp(member.hardSkills),
+        member.HardSkillsMembers &&
+        HttpHardSkillsMapper.ArrayToHttp(member.HardSkillsMembers),
       softSkills:
-        member.softSkills &&
-        HttpSoftSkillsMapper.ArrayToHttp(member.softSkills),
+        member.SoftSkillsMembers &&
+        HttpSoftSkillsMapper.ArrayToHttp(member.SoftSkillsMembers),
       projects:
         member.projects && HttpProjectMapper.ArrayToHttp(member.projects),
     };

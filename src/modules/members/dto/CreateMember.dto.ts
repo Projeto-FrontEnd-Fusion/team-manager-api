@@ -102,6 +102,7 @@ export class CreateMemberDto {
   })
   // @IsOptional()
   @IsString()
+  @IsOptional()
   profileImage?: string;
 
   @ApiProperty({

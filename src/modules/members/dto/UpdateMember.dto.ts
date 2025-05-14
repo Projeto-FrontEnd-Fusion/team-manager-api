@@ -40,11 +40,13 @@ export class UpdateMemberDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsArray()
   professionalProfiles?: {
+    id: string;
     platform: string;
     url: string;
-  };
+    memberId: string;
+  }[];
 
   @ApiProperty({
     description: 'Your professional platform',
@@ -59,7 +61,7 @@ export class UpdateMemberDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsArray()
   hardSkills?: string[];
 
   @ApiProperty({
@@ -67,7 +69,7 @@ export class UpdateMemberDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsArray()
   softSkills?: string[];
 
   @ApiProperty({

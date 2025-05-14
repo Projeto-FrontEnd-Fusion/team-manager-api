@@ -14,9 +14,20 @@ export class MemberRequestTransformInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
 
     if (request.body) {
+      if (request.method == 'POST' || 'PATCH') {
+        request.body = {
+          ...DomainMemberMapper.toDomain({
+            ...request.body,
+            hardSkills: undefined,
+            softSkills: undefined,
+          }),
+          hardSkills: request.body.hardSkills,
+          softSkills: request.body.softSkills
+        }
+        return next.handle();
+      }
       request.body = DomainMemberMapper.toDomain(request.body);
     }
-
     return next.handle();
   }
 }
