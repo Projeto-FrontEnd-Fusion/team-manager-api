@@ -149,23 +149,23 @@ async function createUsers() {
 async function createMembers() {
   const data = [
     {
-      id: '1',
-      userId: '1',
-      communityLevel: 'Senior',
-      name: 'Pedro',
-      stack: 'Senior',
-      currentSquad: 'Dragons',
+      id: "1",
+      userId: "1",
+      communityLevel: "Senior",
+      name: "Pedro",
+      stack: "Senior",
+      currentSquad: "Dragons",
       createdAt: new Date().toISOString(),
       professionalProfiles: [
         {
-          platform: 'linkedin',
-          url: 'https://www.linkedin.com/in/pedro-senior-4002'
+          platform: "linkedin",
+          url: "https://www.linkedin.com/in/pedro-senior-4002"
         },
         {
-          platform: 'instagram',
-          url: 'https://www.instagram.com/pedro-senior-4002'
+          platform: "instagram",
+          url: "https://www.instagram.com/pedro-senior-4002"
         }
-      ]
+      ],
     },
     {
       id: '2',
