@@ -101,9 +101,7 @@ async function createSoftSkills() {
   ]
   try {
     const softSkills = await prisma.softSkills.findMany({
-      select: {
-        name: true
-      }
+      select: { name: true }
     })
     const notIncluded = data.filter(({ name }) => !softSkills.includes({ name }));
     await prisma.softSkills.createMany({
@@ -195,7 +193,7 @@ async function createMembers() {
     const notIncluded = data.filter(({ userId }) => !members.includes({ userId }))
 
     await prisma.member.createMany({
-      data: notIncluded.map(({ professionalProfiles, ...member }) => member),
+      data: [...notIncluded.map(({ professionalProfiles, ...member }) => member)],
     });
 
     for (const member of notIncluded) {
@@ -212,6 +210,24 @@ async function createMembers() {
         });
       }
     }
+
+    await prisma.member.update({
+      where: { id: notIncluded[0].id },
+      data: {
+        HardSkillsMembers: {
+          create: [
+            { hardSkillId: "1" },
+            { hardSkillId: "2" }
+          ]
+        },
+        SoftSkillsMembers: {
+          create: [
+            { softSkillId: "1" },
+            { softSkillId: "2" }
+          ]
+        }
+      }
+    })
   } catch (err) {
     console.log(err);
   }
