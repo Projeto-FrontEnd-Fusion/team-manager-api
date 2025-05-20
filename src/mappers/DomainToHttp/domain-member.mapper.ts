@@ -1,6 +1,8 @@
 import { HttpMemberEntity, MemberEntity } from 'src/entities';
 import { DomainProfessionalProfileMapper } from './domain-professional-profile.mapper';
 import { DomainProjectMapper } from './domain-project.mapper';
+import { DomainHardSkillsMapper } from './domain-hard-skills.mapper';
+import { DomainSoftSkillsMapper } from './domain-soft-skills.mapper';
 
 export class DomainMemberMapper {
   static toDomain(member: HttpMemberEntity): MemberEntity {
@@ -8,6 +10,7 @@ export class DomainMemberMapper {
       return {
         id: member.id,
         name: member.name,
+        userId: member.user_id,
         profileImage: member.profile_image,
         stack: member.stack,
         communityLevel: member.community_level,
@@ -15,9 +18,18 @@ export class DomainMemberMapper {
         updatedAt: member.updated_at,
         professionalProfiles:
           (member.professional_profiles && member.professional_profiles.length > 0)
-            ? DomainProfessionalProfileMapper.ArrayToDomain(member.professional_profiles)
+            ? DomainProfessionalProfileMapper.ArrayToDomain(
+              member.professional_profiles,
+            )
             : [],
-        skills: member.skills ? member.skills : [],
+        hardSkills:
+          (member.hardSkills && member.hardSkills.length > 0)
+            ? DomainHardSkillsMapper.ArrayToDomain(member.hardSkills)
+            : [],
+        softSkills:
+          (member.softSkills && member.softSkills.length > 0)
+            ? DomainSoftSkillsMapper.ArrayToDomain(member.softSkills)
+            : [],
         projects:
           (member.projects && member.projects.length > 0)
             ? DomainProjectMapper.ArrayToDomain(member.projects)

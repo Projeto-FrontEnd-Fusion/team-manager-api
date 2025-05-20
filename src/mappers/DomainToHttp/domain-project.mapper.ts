@@ -1,20 +1,19 @@
-import { HttpMemberEntity, HttpProjectEntity, ProjectEntity } from 'src/entities';
-import { DomainMemberMapper } from './domain-member.mapper';
+import {
+  HttpProjectEntity,
+  ProjectEntity,
+} from 'src/entities';
 
 export class DomainProjectMapper {
   static toDomain(project: HttpProjectEntity): ProjectEntity {
     return {
       id: project.id,
-      cover: project.project_cover,
-      name: project.project_name,
+      name: project.name,
+      cover: project.cover,
       description: project.description,
-      url: project.projectUrl,
-      technologies: project.technologies.join(', '),
-      members:
-        project.members &&
-        project.members.length > 0 &&
-        DomainMemberMapper.ArrayToDomain(project.members as HttpMemberEntity[]),
+      url: project.url,
+      technologies: project.technologies,
       createdAt: project.created_at,
+      members: project.members
     };
   }
 

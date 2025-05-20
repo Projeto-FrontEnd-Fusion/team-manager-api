@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsNotEmpty,
@@ -5,26 +6,37 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-
-import { SoftSkillsEntity } from 'src/entities';
 
 class ProfessionalProfileDto {
-  @ApiProperty({ example: 'linkedin' })
+  @ApiProperty({
+    description: 'You professional profile platform name',
+    example: ['LinkedIn', 'Vercel', 'Instagram', 'Dribbble', 'Behance'],
+  })
   @IsString()
   platform: string;
 
-  @ApiProperty({ example: 'https://linkedin.com/seunome' })
+  @ApiProperty({
+    description: 'Your profissional profile url',
+    example: 'https://linkedin.com/your-name',
+  })
   @IsString()
   url: string;
 }
 
 export class CreateMemberDto {
-  @ApiProperty({ description: 'Name of the member', example: 'John Doe' })
-  @IsNotEmpty()
+  @ApiProperty({
+    description: 'Member Name',
+    example: 'Jhon Doe',
+  })
   @IsString()
   name: string;
+
+  @ApiProperty({
+    description: 'User Id',
+    example: '12345678',
+  })
+  @IsString()
+  userId: string;
 
   @ApiProperty({
     description: 'Technology stack of the member',
@@ -56,27 +68,28 @@ export class CreateMemberDto {
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => ProfessionalProfileDto)
   professionalProfiles: ProfessionalProfileDto[];
 
   @ApiProperty({
-    description: 'Technical skills',
+    description: 'Recive an array of Technical Hard Skills IDs',
     example: ['1', '2', '3'],
+    type: [String],
   })
   @IsOptional()
   @IsArray()
-  skills: string[];
+  hardSkills: string[];
 
   @ApiProperty({
     description: 'Soft skills',
     example: 'Communication, Teamwork',
+    type: [String],
   })
   @IsOptional()
   @IsArray()
-  softSkills?: SoftSkillsEntity[];
+  softSkills: string[];
 
   @ApiProperty({
-    description: 'Imagem de perfil',
+    description: 'Member Personal Image',
     type: 'string',
     format: 'binary',
   })
@@ -89,8 +102,14 @@ export class CreateMemberDto {
   })
   // @IsOptional()
   @IsString()
+  @IsOptional()
   profileImage?: string;
 
+  @ApiProperty({
+    title: 'Project Ids',
+    description: 'Array of Project Ids',
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   projects: string[];

@@ -33,6 +33,8 @@ export class InMemoryProjectRepository {
   }
 
   async remove(itemId: string): Promise<void> {
-    this.responseProject = this.responseProject.filter(({ id }) => id !== itemId);
+    this.responseProject = this.responseProject.filter(
+      ({ id }) => id !== itemId,
+    );
   }
 }

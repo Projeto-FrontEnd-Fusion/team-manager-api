@@ -4,7 +4,7 @@ import { BadRequestException } from '@nestjs/common';
 import { CreateMemberDto } from './dto/CreateMember.dto';
 import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateMemberDto } from './dto/UpdateMember.dto';
 
 const mockMemberService = {
   create: jest.fn(async (dto) => {
@@ -16,7 +16,9 @@ const mockMemberService = {
         id: '1',
         name: 'John Doe',
         profileImage: 'path/to/image',
-        professionalProfiles: [{ platform: 'GitHub', url: 'https://github.com/johndoe' }],
+        professionalProfiles: [
+          { platform: 'GitHub', url: 'https://github.com/johndoe' },
+        ],
       },
     ];
   }),
@@ -69,7 +71,9 @@ describe('MemberController', () => {
         stack: 'Full Stack',
         communityLevel: 'Senior',
         currentSquad: 'Eagles',
-        skills: ['Java', 'JavaScript'],
+        hardSkills: ['1', '2'],
+        softSkills: ['1', '2'],
+        userId: '1',
         professionalProfiles: [
           {
             platform: 'linkedin',
@@ -93,7 +97,7 @@ describe('MemberController', () => {
 
   describe('findMany', () => {
     it('should return all members', async () => {
-      const result = await controller.findAllMembers();
+      const result = await controller.findManyMembers();
 
       expect(service.findMany).toHaveBeenCalled();
       expect(result).toEqual([
@@ -133,13 +137,18 @@ describe('MemberController', () => {
           ),
         );
 
-      await expect(controller.findMemberById('2')).rejects.toThrow(BadRequestException);
+      await expect(controller.findMemberById('2')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('update', () => {
     it('should update a member', async () => {
-      const dto: UpdateCreateMemberDto = { name: 'John Doe', profileImage: '' };
+      const dto: UpdateMemberDto = {
+        name: 'John Doe',
+        profileImageUrl: '',
+      };
       const file = { path: 'path/to/image' } as Express.Multer.File;
 
       const result = await controller.updateMember('1', dto, file);

@@ -1,4 +1,7 @@
-import { HttpProfessionalProfileEntity, ProfessionalProfileEntity } from 'src/entities';
+import {
+  HttpProfessionalProfileEntity,
+  ProfessionalProfileEntity,
+} from 'src/entities';
 
 export class HttpProfessionalProfileMapper {
   static toHttp(
@@ -13,9 +16,9 @@ export class HttpProfessionalProfileMapper {
     };
   }
 
-  static ArrayToHttp(
-    professionalProfiles: ProfessionalProfileEntity[],
-  ): HttpProfessionalProfileEntity[] {
+  static ArrayToHttp(professionalProfiles: ProfessionalProfileEntity[]): HttpProfessionalProfileEntity[] | [] {
+    if (professionalProfiles.length === 0) return [];
+
     return professionalProfiles.map((professionalProfile) =>
       this.toHttp(professionalProfile),
     );

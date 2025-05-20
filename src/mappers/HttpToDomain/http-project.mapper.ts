@@ -1,25 +1,23 @@
-import { HttpProjectEntity, ProjectEntity } from 'src/entities';
+import { HttpProjectEntity, MemberEntity, ProjectEntity } from 'src/entities';
+import { HttpMemberMapper } from './http-member.mapper';
 
 export class HttpProjectMapper {
   static toHttp(project: ProjectEntity): HttpProjectEntity {
+
     return {
       id: project.id,
-      project_cover: project.cover,
-      project_name: project.name,
+      cover: project.cover,
+      name: project.name,
       description: project.description,
-      projectUrl: project.url,
-      technologies: project.technologies.split(',').map((t) => t.trim()),
-      members: project.members.map((member) => {
-        return {
-          id: member.id,
-          name: member.name,
-        };
-      }),
+      url: project.url,
+      technologies: project.technologies,
       created_at: project.createdAt,
+      members: project.members && HttpMemberMapper.ArrayToHttp(project.members as MemberEntity[]),
     };
   }
 
-  static ArrayToHttp(projects: ProjectEntity[]): HttpProjectEntity[] {
+  static ArrayToHttp(projects: ProjectEntity[]): HttpProjectEntity[] | [] {
+    if (projects.length === 0) return [];
     return projects.map((project) => this.toHttp(project));
   }
 }

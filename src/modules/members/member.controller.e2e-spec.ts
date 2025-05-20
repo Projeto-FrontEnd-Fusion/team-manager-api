@@ -36,8 +36,9 @@ describe('MemberController (e2e)', () => {
       stack: 'Full Stack',
       communityLevel: 'Senior',
       currentSquad: 'Eagles',
-      skills: ['Java', 'JavaScript'],
+      hardSkills: ['Java', 'JavaScript'],
       softSkills: [],
+      userId: '1',
       professionalProfiles: [
         {
           platform: 'linkedin',
@@ -56,7 +57,9 @@ describe('MemberController (e2e)', () => {
   });
 
   it('/members (GET)', async () => {
-    const response = await request(app.getHttpServer()).get('/members').expect(200);
+    const response = await request(app.getHttpServer())
+      .get('/members')
+      .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
   });
@@ -73,7 +76,7 @@ describe('MemberController (e2e)', () => {
 
   // it('/members/:id (PATCH)', async () => {
   //   const memberId = 'some-member-id'; // substitua por um ID válido
-  //   const updateMemberDto: UpdateCreateMemberDto = {
+  //   const updateMemberDto: UpdateMemberDto = {
   //     name: 'Jane Doe',
   //     // outros campos necessários
   //   };

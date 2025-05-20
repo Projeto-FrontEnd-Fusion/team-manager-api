@@ -1,4 +1,4 @@
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -20,16 +20,15 @@ import {
   MemberResponseTransformInterceptor,
 } from '@interceptors/index';
 import { CreateMemberDto } from './dto/CreateMember.dto';
-import { HttpMemberMapper } from '@mappers/HttpToDomain';
 import { MemberService } from './member.service';
-import { UpdateCreateMemberDto } from './dto/UpdateMember.dto';
+import { UpdateMemberDto } from './dto/UpdateMember.dto';
 import { multerConfig } from '@configs/multer.config';
+import { ResponseSend } from '@modules/shared/responseSend';
 
 @ApiTags('Members')
 @Controller('members')
 @UseInterceptors(MemberResponseTransformInterceptor)
 export class MemberController {
-  // eslint-disable-next-line prettier/prettier
   constructor(private readonly memberService: MemberService) { }
 
   @Post()
@@ -37,74 +36,126 @@ export class MemberController {
     FileInterceptor('file', multerConfig('member')),
     MemberRequestTransformInterceptor,
   )
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: CreateMemberDto,
-  })
+  @ApiBody({ type: CreateMemberDto })
+  @HttpCode(HttpStatus.CREATED)
   async createMember(
     @Body() data: CreateMemberDto,
     @UploadedFile(
-      new ParseFilePipeBuilder().addMaxSizeValidator({ maxSize: 2048 }).build({
-        fileIsRequired: false,
-        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-      }),
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({ maxSize: 2 * 1024 * 1024 }) // 2 MegaBytes
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
     )
     file?: Express.Multer.File,
   ) {
     if (file) data.profileImage = file.path;
-    return await this.memberService.create(data, file);
+    const result = await this.memberService.create(data);
+
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.CREATED,
+    );
   }
 
   @Get()
+  // TODO: Comentado para não utilizar Guards
+  // @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  async findAllMembers() {
+  async findManyMembers() {
     const result = await this.memberService.findMany();
-    return HttpMemberMapper.ArrayToHttp(result);
+
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findMemberById(@Param('id') id: string) {
-    try {
-      const result = await this.memberService.findById(id);
-      return HttpMemberMapper.toHttp(result);
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.memberService.findById(id);
+
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file', multerConfig('member')))
+  @UseInterceptors(
+    FileInterceptor('file', multerConfig('member')),
+    MemberRequestTransformInterceptor
+  )
   @HttpCode(HttpStatus.OK)
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: UpdateCreateMemberDto,
-  })
+  @ApiBody({ type: UpdateMemberDto })
   async updateMember(
     @Param('id') id: string,
-    @Body() payload: UpdateCreateMemberDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @Body() payload: UpdateMemberDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({ maxSize: 2 * 1024 * 1024 }) // 2 MegaBytes
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
+    )
+    file?: Express.Multer.File,
   ) {
-    try {
-      if (file) {
-        payload.profileImageUrl = file.path;
-      }
-      const result = await this.memberService.update(id, payload, file);
-      return HttpMemberMapper.toHttp(result);
-    } catch (error) {
-      throw error;
-    }
+    if (file) payload.profileImageUrl = file.path;
+    const result = await this.memberService.update(id, payload);
+
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.BAD_REQUEST,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async deleteMember(@Param('id') id: string): Promise<void> {
-    try {
-      return await this.memberService.delete(id);
-    } catch (error) {
-      console.error('Erro ao criar membro:', error);
-      throw error;
-    }
+  async deleteMember(@Param('id') id: string) {
+    const result = await this.memberService.delete(id);
+
+    if (result.isLeft()) return ResponseSend(
+      null,
+      result.value.message,
+      HttpStatus.OK,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 
   @Delete(':memberId/projects/:projectId')
@@ -113,6 +164,21 @@ export class MemberController {
     @Param('memberId') memberId: string,
     @Param('projectId') projectId: string,
   ) {
-    return await this.memberService.deleteMemberFromProject(memberId, projectId);
+    const result = await this.memberService.deleteMemberFromProject(
+      memberId,
+      projectId,
+    );
+
+    if (result.isLeft()) return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.BAD_REQUEST,
+    );
+
+    return ResponseSend(
+      result.value,
+      null,
+      HttpStatus.OK,
+    );
   }
 }

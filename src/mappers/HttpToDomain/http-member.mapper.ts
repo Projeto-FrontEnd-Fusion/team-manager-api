@@ -1,16 +1,17 @@
 import { HttpMemberEntity, MemberEntity } from 'src/entities';
+import { HttpHardSkillsMapper } from './http-hard-skills.mapper';
 import { HttpProfessionalProfileMapper } from './http-professional-profile.mapper';
 import { HttpProjectMapper } from './http-project.mapper';
-import { HttpSkillsMapper } from './http-skills.mapper';
+import { HttpSoftSkillsMapper } from './http-soft-skills.mapper';
+import { DomainMemberEntity } from 'src/entities/member.entity';
 
 export class HttpMemberMapper {
-  static toHttp(member: MemberEntity): HttpMemberEntity {
+  static toHttp(member: DomainMemberEntity): HttpMemberEntity {
     return {
       id: member.id,
       name: member.name,
+      user_id: member.userId,
       profile_image: member.profileImage,
-      // TODO: currentSquad não está sendo utilizado no frontend
-      // current_squad: member.currentSquad,
       stack: member.stack,
       community_level: member.communityLevel,
       created_at: member.createdAt,
@@ -18,12 +19,19 @@ export class HttpMemberMapper {
       professional_profiles:
         member.professionalProfiles &&
         HttpProfessionalProfileMapper.ArrayToHttp(member.professionalProfiles),
-      skills: member.skills && HttpSkillsMapper.ArrayToHttp(member.skills),
-      projects: member.projects && HttpProjectMapper.ArrayToHttp(member.projects),
+      hardSkills:
+        member.HardSkillsMembers &&
+        HttpHardSkillsMapper.ArrayToHttp(member.HardSkillsMembers),
+      softSkills:
+        member.SoftSkillsMembers &&
+        HttpSoftSkillsMapper.ArrayToHttp(member.SoftSkillsMembers),
+      projects:
+        member.projects && HttpProjectMapper.ArrayToHttp(member.projects),
     };
   }
 
-  static ArrayToHttp(members: MemberEntity[]): HttpMemberEntity[] {
+  static ArrayToHttp(members: MemberEntity[]): HttpMemberEntity[] | [] {
+    if (members.length === 0) return [];
     return members.map((member) => this.toHttp(member));
   }
 }

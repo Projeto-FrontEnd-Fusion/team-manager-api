@@ -1,18 +1,16 @@
-import * as path from 'path';
 import { BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
+import { parse } from 'path';
 
 export function multerConfig(uploadPath: 'member' | 'project') {
   const pathImage = './statics/uploads/' + uploadPath;
   return {
     storage: diskStorage({
       destination: pathImage,
-      filename: (req, file, cb) => {
-        const fileName =
-          path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
-        const extension = path.parse(file.originalname).ext;
-        cb(null, `${fileName}${extension}`);
+      filename: (req, file, callback) => {
+        const fileName = parse(file.originalname).name.replace(/\s/g, '') + '-' + Math.round(Math.random()) * 1e9;
+        const ext = parse(file.originalname).ext;
+        callback(null, `${fileName}${ext}`);
       },
     }),
     fileFilter: (req, file, cb) => {

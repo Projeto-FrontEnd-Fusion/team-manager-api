@@ -7,21 +7,29 @@ import { AppService } from './app.service';
 
 import { MemberModule } from '@modules/members/member.module';
 import { ProjectModule } from '@modules/project/project.module';
-import { SkillModule } from '@modules/skills/skill.module';
+import { HardSkillModule } from '@modules/hard_skills/hardSkill.module';
 import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
+import { UserModule } from '@modules/users/user.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { ProfessionalProfileModule } from '@modules/professional_profiles/professionalProfiles.module';
 
 @Module({
   imports: [
+    AuthModule,
+    UserModule,
+    ProfessionalProfileModule,
     ProjectModule,
     MemberModule,
-    SkillModule,
+    HardSkillModule,
     SoftSkillsModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env',
+      envFilePath: process.env.NODE_ENV
+        ? `.env.${process.env.NODE_ENV}`
+        : '.env',
     }),
     ThrottlerModule.forRoot([
       {
@@ -44,4 +52,4 @@ import { SoftSkillsModule } from '@modules/soft_skills/soft-skills.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

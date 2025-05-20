@@ -19,7 +19,7 @@ async function bootstrap() {
 
   app.use(
     '/statics/uploads',
-    express.static(join(__dirname, '..', 'statics', 'uploads')),
+    express.static(join(process.cwd(), 'statics/uploads')),
   );
 
   useSwagger(app);
